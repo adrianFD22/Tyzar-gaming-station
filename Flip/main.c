@@ -210,7 +210,6 @@ int main() {
 
         // Get user input
         pressed_key = getch();
-        if (pressed_key == 'q') goto menu;
 
         if (option_chosen == 1) {
             // If selected field is "Enter file name to load"
@@ -263,6 +262,8 @@ int main() {
                 case 'h':
                     option_chosen = 0;
                     break;
+                case 'q':
+                    goto menu;
             }
         } else {
             switch (pressed_key) {
@@ -282,6 +283,7 @@ int main() {
                     option_chosen = 1;
                     break;
 
+                case 'q':
                 case 'h':
                     goto menu;
                     break;
