@@ -85,9 +85,10 @@ void *tarea1(void *arg) {
     pthread_mutex_lock(&ncurses_mutex);  // lock  
     initscr();                           // iniciar ncurses con el lock activo
     start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK);
-    init_pair(2, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(3, COLOR_GREEN, COLOR_BLACK);
+    use_default_colors();
+    init_pair(1, COLOR_RED, -1);
+    init_pair(2, COLOR_MAGENTA, -1);
+    init_pair(3, COLOR_GREEN, -1);
     pthread_mutex_unlock(&ncurses_mutex);// unlock
 
     //barra

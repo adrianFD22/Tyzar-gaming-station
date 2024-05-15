@@ -48,9 +48,10 @@ void mostrarPath(char array[], int longitud, int posUsuario) {
     int to_down = (term_size_y - 8)/2;
 
     start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK);
-    init_pair(2, COLOR_BLUE, COLOR_BLACK);
-    init_pair(3, COLOR_GREEN, COLOR_BLACK);
+    use_default_colors();
+    init_pair(1, COLOR_RED, -1);
+    init_pair(2, COLOR_BLUE, -1);
+    init_pair(3, COLOR_GREEN, -1);
 
     for (int i = 0; i < longitud * 3; i += 3) {
         if (i / 3 == posUsuario) {

@@ -55,6 +55,7 @@ void dibujarMuneco(int intentos) {
     int to_right = (term_size_x - 2)/2;
 
     start_color();
+    use_default_colors();
     init_pair(1, COLOR_RED, -1); // color rojo para el muneco
 
     if (intentos > 0) {

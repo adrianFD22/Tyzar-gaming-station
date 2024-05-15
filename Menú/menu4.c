@@ -43,7 +43,8 @@ int main() {
 
     // Definir colores
     start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK); // Para el color rojo
+    use_default_colors();
+    init_pair(1, COLOR_RED, -1); // Para el color rojo
 
     // Opciones del menú
     char *opciones[] = { // Arreglo de punteros
