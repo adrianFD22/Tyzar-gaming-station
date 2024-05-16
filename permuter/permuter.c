@@ -61,14 +61,20 @@ int selec() {
     int to_down = (term_size_y)/2 - 2;
 
     mvprintw(to_down-1, to_right, "Selecciona la dificultad: (3-10)\n");
-    mvprintw(to_down+1, to_right-9, "Puedes pulsar '0' para resetear todos los records.");
+    mvprintw(to_down+1, to_right-9, "Puedes pulsar '1' para resetear todos los records.");
+
+    int y, x;
+    getyx(stdscr, y, x);
+    int centerX = term_size_x/2 - 1;
+    move(y+1, centerX);
+
     getnstr(cadena, sizeof(cadena));  // lo hago así para obtener dos cifras en caso de que sea 10
     dificultad = atoi(cadena);        // convertir en int
 
     to_right = (term_size_x - 44)/2;
-    if (dificultad == 0) {
+    if (dificultad == 1) {
         reset();
-        mvprintw(to_down+1, to_right-9, "                 Todos los records reseteados.           ");
+        mvprintw(to_down+1, to_right-9, "     Todos los records reseteados. Pulsa cualquier tecla.");
         getch();
         return selec();
     } else if (dificultad < 3 || dificultad > MAX_DIFICULTAD) {
