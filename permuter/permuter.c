@@ -1,3 +1,5 @@
+// Pendiente: opción de resetear los records
+
 #include <stdlib.h>   // para rand(), exit(), atoi()
 #include <time.h>     // para srand(), cronómetro
 #include <ncurses.h>
@@ -11,6 +13,41 @@
 volatile int detener_hilo = 0; //variable global que detendrá la barra cuando el juego termine
 pthread_mutex_t ncurses_mutex = PTHREAD_MUTEX_INITIALIZER; //para evitar el acceso concurrente de hilos en ciertas secciones
 
+// Función para hacer reset de todos los records
+
+void reset() {
+    FILE *archivo;
+    archivo = fopen("score_tiempo.txt", "r+");
+
+    if (archivo == NULL) {
+        perror("Error al abrir el archivo");
+        return;
+    }
+
+    char linea[100]; // Suponemos que cada línea tiene un máximo de 100 caracteres
+
+    while (fgets(linea, sizeof(linea), archivo) != NULL) {
+        // Mover el puntero de archivo al principio de la línea actual
+        fseek(archivo, -(long)strlen(linea), SEEK_CUR);
+
+        // Escribir el nuevo valor, rellenando el espacio hasta el final de la línea original
+        fprintf(archivo, "20.0000");
+        
+        // Si la línea original era más larga, rellenar con espacios para evitar residuos
+        for (size_t i = strlen("20.0000"); i < strlen(linea) - 1; i++) {
+            fputc(' ', archivo);
+        }
+
+        // Escribir un salto de línea al final
+        fputc('\n', archivo);
+        
+        // Mover el puntero de archivo al inicio de la siguiente línea
+        fseek(archivo, 0, SEEK_CUR);
+    }
+
+    fclose(archivo);
+}
+
 //Función para seleccionar la dificultad
 int selec() {
     clear();
@@ -23,12 +60,18 @@ int selec() {
     int to_right = (term_size_x - 32)/2;
     int to_down = (term_size_y)/2 - 2;
 
-    mvprintw(to_down, to_right, "Selecciona la dificultad: (3-10)\n");
+    mvprintw(to_down-1, to_right, "Selecciona la dificultad: (3-10)\n");
+    mvprintw(to_down+1, to_right-9, "Puedes pulsar '0' para resetear todos los records.");
     getnstr(cadena, sizeof(cadena));  // lo hago así para obtener dos cifras en caso de que sea 10
     dificultad = atoi(cadena);        // convertir en int
 
     to_right = (term_size_x - 44)/2;
-    if (dificultad < 3 || dificultad > MAX_DIFICULTAD) {
+    if (dificultad == 0) {
+        reset();
+        mvprintw(to_down+1, to_right-9, "                 Todos los records reseteados.           ");
+        getch();
+        return selec();
+    } else if (dificultad < 3 || dificultad > MAX_DIFICULTAD) {
         clear();
         mvprintw(to_down, to_right, "Dificultad no válida. Pulsa cualquier tecla.\n");
         getch();
