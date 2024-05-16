@@ -208,6 +208,7 @@ int main() {
 
     int dificultad = selec();
     int numeros[dificultad];
+    curs_set(0);
     noecho();
 
     double inicio = obtener_tiempo();  // al seleccionar la dificultad se inicia el cronómetro
