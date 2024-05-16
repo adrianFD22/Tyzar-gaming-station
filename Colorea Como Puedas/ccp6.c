@@ -21,14 +21,27 @@ int selec() {
     char cadena[MAX_LONGITUD];
     int nodos;
 
-    mvprintw(0, 0, " ¡Bienvenido a Colorea Como Puedas!"); 
-    mvprintw(2, 0, " Selecciona el número de nodos que tendrá el path: (2-10)\n");
+    int term_size_x = getmaxx(stdscr);   // para centrar
+    int term_size_y = getmaxy(stdscr);   // la pantalla
+    int to_right = (term_size_x - 36)/2;
+    int to_down = (term_size_y)/2;
+
+    mvprintw(to_down-3, to_right, " ¡Bienvenido a Colorea Como Puedas!"); 
+    mvprintw(to_down-2, to_right-11," Selecciona el número de nodos que tendrá el path: (2-10)\n");
+
+    int y, x;
+    getyx(stdscr, y, x);
+    int centerX = term_size_x/2 - 1;
+    move(y+1, centerX);  // para centrar el cursor
+
     getnstr(cadena, sizeof(cadena)); // para aceptar el 10 (dos cifras)
     nodos = atoi(cadena); // convierte a tipo int
 
     if (nodos < 2 || nodos > 10) { // arbitrariamente
         clear();
-        mvprintw(0, 1, "Longitud no válida. Pulsa cualquier tecla.\n");
+        mvprintw(to_down-3, to_right-2, "No se ha seleccionado un número válido.\n");
+        mvprintw(to_down-2, to_right-11, "         Pulsa cualquier tecla para continuar...         ");
+        move(y+1, centerX);  // para centrar el cursor
         getch();
         clear();
         return selec();
@@ -168,7 +181,8 @@ int main() {
 
     keypad(stdscr, TRUE);
     clear();
-    noecho(); // Desactivamos el eco de las teclas
+    noecho();      // Desactivamos el eco de las teclas
+    curs_set(0);   // Escondemos el cursor
 
     int posUsuario = 0; // Inicializamos la posición del usuario al principio del path
     mostrarPath(path, longitud, posUsuario);
