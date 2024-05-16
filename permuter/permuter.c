@@ -1,8 +1,10 @@
 #include <stdlib.h>   // para rand(), exit(), atoi()
-#include <time.h>     // para srand()
+#include <time.h>     // para srand(), cronómetro
 #include <ncurses.h>
 #include <unistd.h>   // para sleep() / usleep()
 #include <pthread.h>  // para los hilos
+#include <sys/time.h>
+#include <string.h>
 
 #define MAX_DIFICULTAD 10
 
@@ -21,12 +23,12 @@ int selec() {
     int to_right = (term_size_x - 32)/2;
     int to_down = (term_size_y)/2 - 2;
 
-    mvprintw(to_down, to_right, "Selecciona la dificultad: (2-10)\n");
+    mvprintw(to_down, to_right, "Selecciona la dificultad: (3-10)\n");
     getnstr(cadena, sizeof(cadena));  // lo hago así para obtener dos cifras en caso de que sea 10
     dificultad = atoi(cadena);        // convertir en int
 
     to_right = (term_size_x - 44)/2;
-    if (dificultad < 2 || dificultad > MAX_DIFICULTAD) {
+    if (dificultad < 3 || dificultad > MAX_DIFICULTAD) {
         clear();
         mvprintw(to_down, to_right, "Dificultad no válida. Pulsa cualquier tecla.\n");
         getch();
@@ -84,6 +86,7 @@ void *tarea1(void *arg) {
 
     pthread_mutex_lock(&ncurses_mutex);  // lock  
     initscr();                           // iniciar ncurses con el lock activo
+    use_default_colors();                
     start_color();
     use_default_colors();
     init_pair(1, COLOR_RED, -1);
@@ -138,10 +141,15 @@ void *tarea1(void *arg) {
     return NULL;
 }
 
+double obtener_tiempo() {
+    struct timeval tiempo;
+    gettimeofday(&tiempo, NULL);
+    return tiempo.tv_sec + tiempo.tv_usec * 1e-6;
+}
+
 int main() {
     initscr();
     keypad(stdscr, TRUE);
-    noecho();
     clear();
 
     int term_size_x = getmaxx(stdscr);  
@@ -150,7 +158,10 @@ int main() {
     int to_down = (term_size_y)/2;
 
     int dificultad = selec();
-    int numeros[MAX_DIFICULTAD];
+    int numeros[dificultad];
+    noecho();
+
+    double inicio = obtener_tiempo();  // al seleccionar la dificultad se inicia el cronómetro
 
     pthread_t hilo1;  // inicializamos el hilo
     if (pthread_create(&hilo1, NULL, tarea1, NULL) != 0) {
@@ -211,11 +222,52 @@ int main() {
         }
     }
 
+    // TIME SCORE -----------------------------------------------------------------
+    double fin = obtener_tiempo(); // al superar el juego se para el cronómetro
+    double tiempo_transcurrido = fin - inicio;
+
+    FILE *archivo;
+    archivo = fopen("score_tiempo.txt", "r+");
+    if (archivo == NULL) {
+        perror("Error al abrir el archivo");
+        return 1;
+    }
+
+    char linea[100]; // Suponemos que cada línea tiene un máximo de 100 caracteres
+    int numero_linea = dificultad - 1; // Número de la línea a leer
+    int linea_actual = 1;
+    float record;
+
+    while (fgets(linea, sizeof(linea), archivo) != NULL) {
+        if (linea_actual == numero_linea) {
+            if (sscanf(linea, "%f", &record) == 1) {
+                if (tiempo_transcurrido < record) {
+                    // Mover el puntero de archivo al principio de la línea
+                    fseek(archivo, -(strlen(linea) + 1), SEEK_CUR);
+                    // Escribir el nuevo tiempo transcurrido en la línea
+                    char buffer[50];
+                    sprintf(buffer, "%.2f", tiempo_transcurrido);
+                    fprintf(archivo, "\n%s", buffer);
+                    // Salir del bucle después de actualizar el registro
+                    break;
+                }
+            }
+        }
+        linea_actual++;
+    }
+
+    fclose(archivo);
+
+    // TIME SCORE ----------------------------------------------------------------
+
     clear();
-    mvprintw(to_down - 2, to_right, "¡Juego superado!");
+    mvprintw(to_down-2, to_right, "¡Juego superado!");
     mvprintw(to_down, to_right+4, "Score:");
     mvprintw(to_down+2, to_right + 1, "Dificultad: %d", dificultad);
     mvprintw(to_down+3, to_right, "Movimientos: %d", movimientos);
+    mvprintw(to_down+5, to_right-7, "Tu tiempo: %.2f   Record: %.2f", tiempo_transcurrido, record);
+
+    
     detener_hilo = 1; // detener barra
     getch();
     clear();
