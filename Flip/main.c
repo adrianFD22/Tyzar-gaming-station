@@ -220,8 +220,10 @@ int main() {
                         if (load_board(&board_backup, board_name)) {
                             options.sel = 2;
                             BOARD = 0;
+                            for (int i=0; i< board_name_len; i++) {
+                                board_name[i] = '\0';
+                            }
                             board_name_len = 0;
-                            board_name[0] = '\0';
                         } else {
                             n_rows = board_backup[0][0];
                             n_cols = board_backup[0][1];
