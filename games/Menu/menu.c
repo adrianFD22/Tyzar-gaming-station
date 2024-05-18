@@ -1,5 +1,13 @@
+#include <stdlib.h>
+#include <string.h>
 #include <ncurses.h>
 #include <locale.h>   // para caracteres especiales
+
+
+#define COMPILE_DIR "compiled/"
+#define STR_LEN 100
+#define incrementar_var(x, top) (x) = (x) + 1 <= (top) ? (x) + 1 : (x)
+#define decrementar_var(x, bottom) (x) = (x) - 1 >= (bottom) ? (x) - 1 : (x)
 
 void inicioLetras() {
     int term_size_x = getmaxx(stdscr);   // para centrar
@@ -57,13 +65,27 @@ int main() {
         "crazy flip it",
         "Salir"
     };
+
+    char *nombres_juegos[] = {
+        "press_the_key",
+        "ahorcado",
+        "nim",
+        "permuter",
+        "ccp",
+        "maze",
+        "flip"
+    };
+    int opciones_len = sizeof(opciones) / sizeof(opciones[0]);
+
+    char *ruta_juego = (char*) malloc(STR_LEN * sizeof(char));
+
     int seleccion = 0;
     int opcion;
 
     inicioLetras();
-    int term_size_x = getmaxx(stdscr);  
+    int term_size_x = getmaxx(stdscr);
     int to_right2 = (term_size_x - 42)/2;
-    int term_size_y = getmaxy(stdscr);  
+    int term_size_y = getmaxy(stdscr);
     int to_down2 = (term_size_y - 1)/2;
 
     // Ciclo del menú
@@ -92,96 +114,47 @@ int main() {
             attroff(A_REVERSE);  // Quita la inversión de color
         }
         refresh(); // Actualizar la pantalla
-        
+
         opcion = getch(); // Capturar entrada del usuario
         switch (opcion) {
             case 'k':
             case KEY_UP:
-                seleccion--;
-                if (seleccion < 0) {
-                    seleccion = 7;
-                }
+                decrementar_var(seleccion, 0);
                 break;
+
             case 'j':
             case KEY_DOWN:
-                seleccion++;
-                if (seleccion > 7) {
-                    seleccion = 0;
-                }
+                incrementar_var(seleccion, opciones_len-1);
                 break;
-            case 'h':
+
+            case 'q':
+                goto fin_partida;
+                break;
+
             case 'l':
-            case 10: // Tecla ENTER
-                if (seleccion == 7) {
-                    // Salir del ciclo si se selecciona "Salir"
-                    endwin();
-                    return 0;
-                } else if (seleccion == 2) {
-                    // Ejecutar NIM
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./nim");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
-                } else if (seleccion == 1) {
-                    // Ejecutar ahorcado 2
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./ahorcado");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
-                } else if (seleccion == 0) {
-                    // Ejecutar Need 4 Speed
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./presskey");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
+            case '\n':
+                // Si la opción seleccionada es salir
+                if (seleccion == opciones_len-1) {
+                    goto fin_partida;
                 }
-                else if (seleccion == 3) {
-                    // Ejecutar permuter
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./ordenar");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
-                }
-                else if (seleccion == 4) {
-                    // Ejecutar Colorea Como PUedas
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./ccp");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
-                }
-                else if (seleccion == 5) {
-                    // Ejecutar MAZE
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./maze");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
-                }
-                else if (seleccion == 6) {
-                    // Ejecutar Flip it
-                    clear();
-                    refresh();
-                    endwin();
-                    system("./flipit");
-                    mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
-                    getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
-                }
+
+                // Si la opción seleccionada es un juego
+                strcpy(ruta_juego, COMPILE_DIR);
+                strcat(ruta_juego, nombres_juegos[seleccion]);
+                endwin();
+
+                system(ruta_juego);
+
+                clear();
+                refresh();
+                mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
+                getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
                 break;
         }
     }
 
     // Cerrar ncurses
+    fin_partida:
     endwin();
 
     return 0;
