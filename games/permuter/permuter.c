@@ -1,5 +1,3 @@
-// Pendiente: opción de resetear los records
-
 #include <stdlib.h>   // para rand(), exit(), atoi()
 #include <time.h>     // para srand(), cronómetro
 #include <ncurses.h>
@@ -219,18 +217,20 @@ int main() {
         return 1;
     }
 
-    srand(time(NULL));  // creamos el array aleatorio
-    for (int i = 0; i < dificultad; i++) {
+    int comprobacion = 0; // condición de victoria
+    srand(time(NULL));    // creamos el array aleatorio
+    do {                  // nos aseguramos de que no sale ya ordenado
+        for (int i = 0; i < dificultad; i++) {
         numeros[i] = rand() % 10;
-    }
-
+        }
+        comprobacion = estaOrdenado(numeros, dificultad);
+    } while (comprobacion == 1);
 
     clear();
     int posUsuario = 0;
     mostrarArray(numeros, dificultad, posUsuario);
 
     int movimientos = 0;  // para score
-    int comprobacion = 0; // condición de victoria
     int ch;
     while (comprobacion == 0 && detener_hilo == 0) {
         ch = getch();
