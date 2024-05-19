@@ -52,12 +52,14 @@ int main() {
     // Definir colores
     start_color();
     use_default_colors();
-    init_pair(1, COLOR_RED, -1); // Para el color rojo
+    init_pair(1, COLOR_RED, -1);   // Para el color rojo
+    init_pair(2, COLOR_BLUE, -1);  // Para el color azul
+    init_pair(3, COLOR_GREEN, -1); // Para el color verde
 
     // Opciones del menú
-    char *opciones[] = { // Arreglo de punteros
+    char *opciones[] = { 
         "Need 4 Speed",
-        "Ahorcado", // Opción 2 en color rojo
+        "Ahorcado", 
         "NIM",
         "Xx_permuter_xX",
         "Colorea Como Puedas: Digital Edition 2024",
@@ -111,6 +113,35 @@ int main() {
                 //mvprintw(2, 1, "ą̴̰̤̹͚̗̑͊̆̊h̵̠̟̤̱̳͙̬͇͋͗̓̚o̸͈̣̲͗̂͋̔̓̿̔́̇͘̚͝ŗ̵̛̛̠͕̩̜̦͔̦̩̻͚͒̽͋̀̾͆̊̚͘c̸̢̫̠͎̬̖͎̼̩͑̽̊̑̌͆́̋̊̎̕̕͝͠ą̸͈̪̫̰͇̻̺̈́̒̓͒́͛̎͒͛̆͜͠d̷̟̗̙̰̲̅͐̈́̓̚̚͝o̵̡̡̳̜̟̻͙͎͋͂̄̂̀̊̇̍̿͆̂̌̾̄");
                 attroff(COLOR_PAIR(1));
             }
+            // CCP con colorinchis
+            if (seleccion == 4) {
+                //attron(A_REVERSE);
+
+                attron(COLOR_PAIR(1));
+                mvprintw(5, 1, "Colorea");
+                attroff(COLOR_PAIR(1));
+                mvprintw(5, 8, "--");
+                attron(COLOR_PAIR(2));
+                mvprintw(5, 10, "Como");
+                attroff(COLOR_PAIR(2));
+                mvprintw(5, 14, "--");
+                attron(COLOR_PAIR(3));
+                mvprintw(5, 16, "Puedas:");
+                attroff(COLOR_PAIR(3));
+                mvprintw(5, 23, "--");
+                attron(COLOR_PAIR(1));
+                mvprintw(5, 25, "Digital");
+                attroff(COLOR_PAIR(1));
+                mvprintw(5, 32, "--");
+                attron(COLOR_PAIR(2));
+                mvprintw(5, 34, "Edition");
+                attroff(COLOR_PAIR(2));
+                mvprintw(5, 41, "--");
+                attron(COLOR_PAIR(1));
+                mvprintw(5, 43, "2024");
+                attroff(COLOR_PAIR(1));
+            }
+
             attroff(A_REVERSE);  // Quita la inversión de color
         }
         refresh(); // Actualizar la pantalla
