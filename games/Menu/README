@@ -1,6 +1,0 @@
-ejecuta lo siguiente en la terminal, en
-la misma carpeta en la que descomprimiste los archivos:
-
-chmod +x compiler.sh
-./compiler.sh
-./menu4
