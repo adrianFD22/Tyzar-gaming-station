@@ -113,6 +113,13 @@ int main() {
                 //mvprintw(2, 1, "ą̴̰̤̹͚̗̑͊̆̊h̵̠̟̤̱̳͙̬͇͋͗̓̚o̸͈̣̲͗̂͋̔̓̿̔́̇͘̚͝ŗ̵̛̛̠͕̩̜̦͔̦̩̻͚͒̽͋̀̾͆̊̚͘c̸̢̫̠͎̬̖͎̼̩͑̽̊̑̌͆́̋̊̎̕̕͝͠ą̸͈̪̫̰͇̻̺̈́̒̓͒́͛̎͒͛̆͜͠d̷̟̗̙̰̲̅͐̈́̓̚̚͝o̵̡̡̳̜̟̻͙͎͋͂̄̂̀̊̇̍̿͆̂̌̾̄");
                 attroff(COLOR_PAIR(1));
             }
+            // NIM parpadeante
+            if (seleccion == 2) {
+                attron(A_REVERSE);
+                attron(A_BLINK);
+                mvprintw(3, 1, "NIM");
+                attroff(A_BLINK);
+            }
             // CCP con colorinchis
             if (seleccion == 4) {
                 //attron(A_REVERSE);
