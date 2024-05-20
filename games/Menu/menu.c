@@ -179,7 +179,8 @@ int main() {
                 mvprintw(5, 43, "2024");
                 attroff(COLOR_PAIR(1));
             }
-            // NIM parpadeante
+            /*
+            // MAZE mazed
             if (seleccion == 5) {
                 //attron(A_REVERSE);
                 mvprintw(3, 1, "NIM                _______________");
@@ -191,6 +192,7 @@ int main() {
                 attron(A_REVERSE);
                 mvprintw(6, 1, "MAZE");
             }
+            */
 
             attroff(A_REVERSE);  // Quita la inversión de color
         }
