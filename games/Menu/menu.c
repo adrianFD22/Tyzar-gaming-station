@@ -125,14 +125,30 @@ int main() {
             // Permutter permutado, secuencia de permutaciones
             if (seleccion == 3) {
                 attron(A_REVERSE);
-                if (paridad % 2 == 0) {
+                if (paridad % 8 == 0) {
                     mvprintw (4, 1, "Xx_Permuter_xX");
                     opciones[3] = "Xx_Permuter_xX";
-                    //paridad++;
-                } else {
+                } else if (paridad % 8 == 1) {
                     mvprintw(4, 1, "Xx_ePrmuter_xX");
                     opciones[3] = "Xx_ePrmuter_xX";
-                    //paridad++;
+                } else if (paridad % 8 == 2) {
+                    mvprintw(4, 1, "Xx_erPmuter_xX");
+                    opciones[3] = "Xx_erPmuter_xX";
+                } else if (paridad % 8 == 3) {
+                    mvprintw(4, 1, "Xx_ermPuter_xX");
+                    opciones[3] = "Xx_ermPuter_xX";
+                } else if (paridad % 8 == 4) {
+                    mvprintw(4, 1, "Xx_ermuPter_xX");
+                    opciones[3] = "Xx_ermuPter_xX";
+                } else if (paridad % 8 == 5) {
+                    mvprintw(4, 1, "Xx_ermutPer_xX");
+                    opciones[3] = "Xx_ermutPer_xX";
+                } else if (paridad % 8 == 6) {
+                    mvprintw(4, 1, "Xx_ermutePr_xX");
+                    opciones[3] = "Xx_ermutePr_xX";
+                } else if (paridad % 8 == 7) {
+                    mvprintw(4, 1, "Xx_ermuterP_xX");
+                    opciones[3] = "Xx_ermuterP_xX";
                 }
             }
             // CCP con colorinchis
