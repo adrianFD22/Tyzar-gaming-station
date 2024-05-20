@@ -179,6 +179,14 @@ int main() {
                 mvprintw(5, 43, "2024");
                 attroff(COLOR_PAIR(1));
             }
+            // NIM parpadeante
+            if (seleccion == 5) {
+                //attron(A_REVERSE);
+                mvprintw(6, 1, "MAZE      ← ← ←   ↓ ←   #");
+                mvprintw(7, 1, "crazy flip it ↑ ← ←");
+                attron(A_REVERSE);
+                mvprintw(6, 1, "MAZE");
+            }
 
             attroff(A_REVERSE);  // Quita la inversión de color
         }
@@ -189,13 +197,13 @@ int main() {
             case 'k':
             case KEY_UP:
                 decrementar_var(seleccion, 0);
-                if (seleccion == 3) paridad++;
+                if (seleccion == 3) paridad++; // para permuter
                 break;
 
             case 'j':
             case KEY_DOWN:
                 incrementar_var(seleccion, opciones_len-1);
-                if (seleccion == 3) paridad++;
+                if (seleccion == 3) paridad++; // para permuter
                 break;
 
             case 'q':
