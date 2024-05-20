@@ -182,8 +182,12 @@ int main() {
             // NIM parpadeante
             if (seleccion == 5) {
                 //attron(A_REVERSE);
-                mvprintw(6, 1, "MAZE      ← ← ←   ↓ ←   #");
-                mvprintw(7, 1, "crazy flip it ↑ ← ←");
+                mvprintw(3, 1, "NIM                _______________");
+                mvprintw(4, 1, "Xx_Permuter_xX     | ↓ ← ← ← ← ← |");
+                mvprintw(5, 1, "Colorea Como Puedas: ↓ Digital ↑ Edition 2024");
+                mvprintw(6, 1, "MAZE     ← ← ← ← ← | ↓ |     | ↑ ←  #");
+                mvprintw(7, 1, "crazy flip it ˉ| ↑ ← ← |     ˉˉˉˉˉˉˉˉˉ");
+                mvprintw(8, 1, "Salir          ˉˉˉˉˉˉˉˉˉ");
                 attron(A_REVERSE);
                 mvprintw(6, 1, "MAZE");
             }
