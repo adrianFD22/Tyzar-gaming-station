@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include <locale.h>   // para caracteres especiales
+#include <unistd.h>   // para sleep() / usleep()
 
 
 #define COMPILE_DIR "compiled/"
@@ -61,7 +62,7 @@ int main() {
         "Need 4 Speed",
         "Ahorcado", 
         "NIM",
-        "Xx_permuter_xX",
+        "Xx_Permuter_xX",
         "Colorea Como Puedas: Digital Edition 2024",
         "MAZE",
         "crazy flip it",
@@ -83,6 +84,7 @@ int main() {
 
     int seleccion = 0;
     int opcion;
+    int paridad = 0; // para mostrar permuter cambiando
 
     inicioLetras();
     int term_size_x = getmaxx(stdscr);
@@ -120,11 +122,24 @@ int main() {
                 mvprintw(3, 1, "NIM");
                 attroff(A_BLINK);
             }
+            // Permutter permutado, secuencia de permutaciones
+            if (seleccion == 3) {
+                attron(A_REVERSE);
+                if (paridad % 2 == 0) {
+                    mvprintw (4, 1, "Xx_Permuter_xX");
+                    opciones[3] = "Xx_Permuter_xX";
+                    //paridad++;
+                } else {
+                    mvprintw(4, 1, "Xx_ePrmuter_xX");
+                    opciones[3] = "Xx_ePrmuter_xX";
+                    //paridad++;
+                }
+            }
             // CCP con colorinchis
             if (seleccion == 4) {
                 //attron(A_REVERSE);
 
-                attron(COLOR_PAIR(1));
+                attron(COLOR_PAIR(1));      // se viene troncho infumable
                 mvprintw(5, 1, "Colorea");
                 attroff(COLOR_PAIR(1));
                 mvprintw(5, 8, "--");
@@ -158,11 +173,13 @@ int main() {
             case 'k':
             case KEY_UP:
                 decrementar_var(seleccion, 0);
+                if (seleccion == 3) paridad++;
                 break;
 
             case 'j':
             case KEY_DOWN:
                 incrementar_var(seleccion, opciones_len-1);
+                if (seleccion == 3) paridad++;
                 break;
 
             case 'q':
