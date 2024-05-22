@@ -173,29 +173,29 @@ int main() {
     inicio();
     int longitud = selec();
 
-    char path[MAX_LONGITUD] = "0";               //primer nodo
-    for (int i = 0; i < (longitud-1)*3; i++) {   //resto de nodos
+    // Construir el path completo
+    char path[MAX_LONGITUD] = "0";                 // primer nodo
+    for (int i = 0; i < (longitud - 1) * 3; i++) { // resto de nodos
         strcat(path, "--0");
     }
-    strcat(path, "\0"); //esto igual no es necesario pero porsiaca
 
     keypad(stdscr, TRUE);
-    clear();
-    noecho();      // Desactivamos el eco de las teclas
-    curs_set(0);   // Escondemos el cursor
+    noecho();    // Desactivamos el eco de las teclas
+    curs_set(0); // Escondemos el cursor
 
     int posUsuario = 0; // Inicializamos la posición del usuario al principio del path
+    clear();            // Limpiamos la pantalla antes de mostrar el path
     mostrarPath(path, longitud, posUsuario);
 
-    int term_size_y = getmaxy(stdscr);  // para centrar la pantalla
-    int to_down = (term_size_y - 8)/2;
+    int term_size_y = getmaxy(stdscr); // para centrar la pantalla
+    int to_down = (term_size_y - 8) / 2;
     int term_size_x = getmaxx(stdscr);
-    int to_right = (term_size_x - 20)/2;
+    int to_right = (term_size_x - 20) / 2;
 
     int turno = 0;               // para pasar el turno
     int comprobacion = longitud; // para condición de victoria
     int ch;                      // para introducir las teclas
-    while (comprobacion > 0) { 
+    while (comprobacion > 0) {
         ch = getch();
         switch (ch) {
             case 'h':
@@ -208,7 +208,7 @@ int main() {
             case KEY_RIGHT:
                 if (posUsuario < longitud - 1) {
                     posUsuario++;
-                }   
+                }
                 break;
             case 'i':
                 instrucciones();
@@ -217,48 +217,48 @@ int main() {
                 comprobacion = 0; // salir del programa
                 break;
             case 'k':
-            case 10: //enter
-                if (path[posUsuario*3] == '0') { //para escribir un numero el nodo ha de estar vacío
-                    if (posUsuario == 0) { //si estamos en el primer nodo
-                        if (path[(posUsuario+1)*3] == '1') {
-                            path[posUsuario*3] = '2';
+            case 10: // enter
+                if (path[posUsuario * 3] == '0') { // para escribir un número el nodo ha de estar vacío
+                    if (posUsuario == 0) { // si estamos en el primer nodo
+                        if (path[(posUsuario + 1) * 3] == '1') {
+                            path[posUsuario * 3] = '2';
                         }
                         else {
-                            path[posUsuario*3] = '1';
+                            path[posUsuario * 3] = '1';
                         }
                     }
-                    else if (posUsuario == longitud-1) { //si estamos en el último nodo
-                        if (path[(posUsuario-1)*3] == '1') {
-                            path[posUsuario*3] = '2';
+                    else if (posUsuario == longitud - 1) { // si estamos en el último nodo
+                        if (path[(posUsuario - 1) * 3] == '1') {
+                            path[posUsuario * 3] = '2';
                         }
                         else {
-                            path[posUsuario*3] = '1';
+                            path[posUsuario * 3] = '1';
                         }
                     }
-                    else { //en cualquier nodo intermedio
-                        if (path[(posUsuario-1)*3] != '1' && path[(posUsuario+1)*3] != '1') {
-                            path[posUsuario*3] = '1';
+                    else { // en cualquier nodo intermedio
+                        if (path[(posUsuario - 1) * 3] != '1' && path[(posUsuario + 1) * 3] != '1') {
+                            path[posUsuario * 3] = '1';
                         }
-                        else if (path[(posUsuario-1)*3] != '2' && path[(posUsuario+1)*3] != '2') {
-                            path[posUsuario*3] = '2';
+                        else if (path[(posUsuario - 1) * 3] != '2' && path[(posUsuario + 1) * 3] != '2') {
+                            path[posUsuario * 3] = '2';
                         }
                         else {
-                            path[posUsuario*3] = '3';
-                            comprobacion = 0; //  condición de fin del juego
+                            path[posUsuario * 3] = '3';
+                            comprobacion = 0; // condición de fin del juego
                         }
                     }
-                turno++; // cada vez que se pulsa enter se introduce un número en el nodo y se pasa el turno
-                comprobacion--; // al llegar a 0 se acaba la partida
+                    turno++; // cada vez que se pulsa enter se introduce un número en el nodo y se pasa el turno
+                    comprobacion--; // al llegar a 0 se acaba la partida
                 }
                 break;
         }
         mostrarPath(path, longitud, posUsuario);
-        mvprintw(3+to_down, 0+to_right, "Turno del jugador: %d", turno%2);
-        mvprintw(6+to_down, 1, "Pulsa 'i' para abrir el manual de instrucciones.");
-        mvprintw(7+to_down, 1, "Pulsa 'q' para salir del juego.");
+        mvprintw(3 + to_down, 0 + to_right, "Turno del jugador: %d", turno % 2);
+        mvprintw(6 + to_down, 1, "Pulsa 'i' para abrir el manual de instrucciones.");
+        mvprintw(7 + to_down, 1, "Pulsa 'q' para salir del juego.");
     }
 
-    mvprintw(3+to_down, 0+to_right, "¡Gana el jugador: %d!", turno%2);
+    mvprintw(3 + to_down, 0 + to_right, "¡Gana el jugador: %d!", turno % 2);
     getch(); // Esperar a que el usuario presione una tecla para ver la pantalla de victoria
     endwin();
 
