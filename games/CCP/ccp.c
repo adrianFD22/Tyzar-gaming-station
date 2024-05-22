@@ -10,7 +10,7 @@ versión 5: modificaciones teclado hl k + condiciones de victoria + inicio letra
 versión 6: Interfaz centrada + colores (ahora sí es colorea como puedas)
 */
 
-#include <ncurses.h> 
+#include <ncurses.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -26,7 +26,7 @@ int selec() {
     int to_right = (term_size_x - 36)/2;
     int to_down = (term_size_y)/2;
 
-    mvprintw(to_down-3, to_right, " ¡Bienvenido a Colorea Como Puedas!"); 
+    mvprintw(to_down-3, to_right, " ¡Bienvenido a Colorea Como Puedas!");
     mvprintw(to_down-2, to_right-11," Selecciona el número de nodos que tendrá el path: (2-10)\n");
 
     int y, x;
@@ -52,15 +52,15 @@ int selec() {
 
 // Función para mostrar el path en pantalla, cada nodo tiene estructura "0--" para simular un grafo,
 // por lo que nos moveremos de tres en tres caracteres a través de él
-void mostrarPath(char array[], int longitud, int posUsuario) {
-    clear(); 
+void mostrarPath(char array[], int longitud, int posUsuario) {      // array no es un nombre muy descriptivo
+    clear();
 
     int term_size_x = getmaxx(stdscr);   // para centrar
     int term_size_y = getmaxy(stdscr);   // la pantalla
     int to_right = (term_size_x - longitud*3)/2 + 1;
     int to_down = (term_size_y - 8)/2;
 
-    start_color();
+    start_color();                              // estas cosas hay que inicializarlas cada vez? no se pueden poner en el main?
     use_default_colors();
     init_pair(1, COLOR_RED, -1);
     init_pair(2, COLOR_BLUE, -1);
@@ -71,9 +71,12 @@ void mostrarPath(char array[], int longitud, int posUsuario) {
             attron(A_REVERSE); // Invertimos los colores para resaltar la posición del usuario
             mvprintw(0+to_down, i+to_right, "%c", array[i]);
             attroff(A_REVERSE); // Restauramos los colores originales después de imprimir el número
-            mvprintw(0+to_down, i+1+to_right, "%c%c ", array[i+1], array[i+2]);
         } else {
-            mvprintw(0+to_down, i+to_right, "%c%c%c ", array[i], array[i + 1], array[i + 2]);
+            mvprintw(0+to_down, i+to_right, "%c ", array[i]);
+        }
+
+        if ( i / 3 != longitud-1 ) {
+            mvprintw(0+to_down, i+1+to_right, "%c%c ", array[i+1], array[i+2]);
         }
 
         if (array[i] == '1') {
@@ -104,14 +107,14 @@ void mostrarPath(char array[], int longitud, int posUsuario) {
             attroff(COLOR_PAIR(3));
         }
     }
-    array[longitud*3-1] = '\0';   // cerrar el path visualmente, elimina 
-    array[longitud*3-2] = '\0';   // los dos últimos '--'
+    /* array[longitud*3-1] = '\0';   // cerrar el path visualmente, elimina
+    array[longitud*3-2] = '\0';   // los dos últimos '--' */
 
-    printw("\n\n");
+    /* printw("\n\n"); */
     refresh();
 }
 
-// Manual de 
+// Manual de
 void instrucciones() {
     initscr();
     noecho();
@@ -125,7 +128,7 @@ void instrucciones() {
     mvprintw(8, 0, "-------------------------------------------------------------------");
     mvprintw(9, 0, "El objetivo de Colorea Como puedas es asignar un número a cada nodo");
     mvprintw(10, 0, "del grafo con la tecla de acción, desplazándonos por el mismo con");
-    mvprintw(11, 0, "las teclas de movimiento. El número asignado al nodo será siempre"); 
+    mvprintw(11, 0, "las teclas de movimiento. El número asignado al nodo será siempre");
     mvprintw(12, 0, "el mínimo posible distinto del de sus vecinos.");
     mvprintw(13, 0, "Un nodo vacío tiene número '0'");
     mvprintw(14, 0, "Pierde el jugador que asigne el número 3 a un nodo o el  que asigna");
@@ -185,7 +188,7 @@ int main() {
 
     int posUsuario = 0; // Inicializamos la posición del usuario al principio del path
     clear();            // Limpiamos la pantalla antes de mostrar el path
-    mostrarPath(path, longitud, posUsuario);
+    //mostrarPath(path, longitud, posUsuario);
 
     int term_size_y = getmaxy(stdscr); // para centrar la pantalla
     int to_down = (term_size_y - 8) / 2;
@@ -196,6 +199,10 @@ int main() {
     int comprobacion = longitud; // para condición de victoria
     int ch;                      // para introducir las teclas
     while (comprobacion > 0) {
+        mostrarPath(path, longitud, posUsuario);
+        mvprintw(3 + to_down, 0 + to_right, "Turno del jugador: %d", turno % 2);
+        mvprintw(6 + to_down, 1, "Pulsa 'i' para abrir el manual de instrucciones.");
+        mvprintw(7 + to_down, 1, "Pulsa 'q' para salir del juego.");
         ch = getch();
         switch (ch) {
             case 'h':
@@ -252,12 +259,10 @@ int main() {
                 }
                 break;
         }
-        mostrarPath(path, longitud, posUsuario);
-        mvprintw(3 + to_down, 0 + to_right, "Turno del jugador: %d", turno % 2);
-        mvprintw(6 + to_down, 1, "Pulsa 'i' para abrir el manual de instrucciones.");
-        mvprintw(7 + to_down, 1, "Pulsa 'q' para salir del juego.");
     }
 
+    // Va mal esto. Si pulsas q ganas inmediatamente. No sé si era esa tu intención, en cuyo caso, buen trabajo
+    mostrarPath(path, longitud, posUsuario);
     mvprintw(3 + to_down, 0 + to_right, "¡Gana el jugador: %d!", turno % 2);
     getch(); // Esperar a que el usuario presione una tecla para ver la pantalla de victoria
     endwin();
