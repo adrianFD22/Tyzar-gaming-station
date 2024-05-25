@@ -97,7 +97,7 @@ int main() {
         "Xx_ermuPter_xX", "Xx_ermutPer_xX", "Xx_ermutePr_xX", "Xx_ermuterP_xX"
     };
 
-    const char *text = "Need 4 Speed";
+    const char *text = "Need 4 Speed"; // para funcoinalidad N4S
     int text_len = strlen(text);
 
     // Ciclo del menú
