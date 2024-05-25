@@ -58,6 +58,22 @@ int selec() {
     int to_right = (term_size_x - 32)/2;
     int to_down = (term_size_y)/2 - 2;
 
+    char chill;
+    do {
+        clear(); // Limpia la pantalla antes de imprimir
+        mvprintw(to_down-1, to_right+5, "¿Activar modo chill? (y/n)");
+        refresh();      
+
+        int centerX = term_size_x / 2 - 1;
+        move(to_down, centerX);    
+        refresh(); 
+        chill = getchar(); 
+    } while (chill != 'y' && chill != 'n');
+    if (chill == 'y') {
+        detener_hilo = 1;
+    }
+
+    clear();
     mvprintw(to_down-1, to_right, "Selecciona la dificultad: (3-10)\n");
     mvprintw(to_down+1, to_right-9, "Puedes pulsar '1' para resetear todos los records.");
 
@@ -232,7 +248,7 @@ int main() {
 
     int movimientos = 0;  // para score
     int ch;
-    while (comprobacion == 0 && detener_hilo == 0) {
+    while (comprobacion == 0) {
         ch = getch();
         switch (ch) {
             case 'q':    // salida auto del juego
