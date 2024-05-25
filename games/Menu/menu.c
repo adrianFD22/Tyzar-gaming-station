@@ -92,10 +92,13 @@ int main() {
     int term_size_y = getmaxy(stdscr);
     int to_down2 = (term_size_y - 1)/2;
 
-    const char *variantes[] = { // para pasar por el permuter
+    const char *variantes[] = { // para funcionalidad permuter
         "Xx_Permuter_xX", "Xx_ePrmuter_xX", "Xx_erPmuter_xX", "Xx_ermPuter_xX",
         "Xx_ermuPter_xX", "Xx_ermutPer_xX", "Xx_ermutePr_xX", "Xx_ermuterP_xX"
     };
+
+    const char *text = "Need 4 Speed";
+    int text_len = strlen(text);
 
     // Ciclo del menú
     while (1) {
@@ -107,6 +110,19 @@ int main() {
             }
             mvprintw(i + 1, 1, "%s", opciones[i]);
 
+            // velocidad en need 4 speed
+            if (seleccion == 0) {
+                    for (int i = 0; i < COLS - text_len; i = i + 10) {
+                        mvprintw(1, i, text);
+                        refresh();
+                        usleep(5000);
+                        mvprintw(1, i, "             ");
+                    }
+                    attron(A_REVERSE);
+                    mvprintw(1, 1, text); // Posición final
+                    attroff(A_REVERSE);
+                    refresh();
+            }
             // volver loca la opción crazy flip it
             if (seleccion == 6) {
                 attron(A_REVERSE);
