@@ -92,6 +92,11 @@ int main() {
     int term_size_y = getmaxy(stdscr);
     int to_down2 = (term_size_y - 1)/2;
 
+    const char *variantes[] = { // para pasar por el permuter
+        "Xx_Permuter_xX", "Xx_ePrmuter_xX", "Xx_erPmuter_xX", "Xx_ermPuter_xX",
+        "Xx_ermuPter_xX", "Xx_ermutPer_xX", "Xx_ermutePr_xX", "Xx_ermuterP_xX"
+    };
+
     // Ciclo del menú
     while (1) {
         // Limpiar pantalla y mostrar opciones
@@ -125,32 +130,11 @@ int main() {
             // Permutter permutado, secuencia de permutaciones
             if (seleccion == 3) {
                 attron(A_REVERSE);
-                if (paridad % 8 == 0) {
-                    mvprintw (4, 1, "Xx_Permuter_xX");
-                    opciones[3] = "Xx_Permuter_xX";
-                } else if (paridad % 8 == 1) {
-                    mvprintw(4, 1, "Xx_ePrmuter_xX");
-                    opciones[3] = "Xx_ePrmuter_xX";
-                } else if (paridad % 8 == 2) {
-                    mvprintw(4, 1, "Xx_erPmuter_xX");
-                    opciones[3] = "Xx_erPmuter_xX";
-                } else if (paridad % 8 == 3) {
-                    mvprintw(4, 1, "Xx_ermPuter_xX");
-                    opciones[3] = "Xx_ermPuter_xX";
-                } else if (paridad % 8 == 4) {
-                    mvprintw(4, 1, "Xx_ermuPter_xX");
-                    opciones[3] = "Xx_ermuPter_xX";
-                } else if (paridad % 8 == 5) {
-                    mvprintw(4, 1, "Xx_ermutPer_xX");
-                    opciones[3] = "Xx_ermutPer_xX";
-                } else if (paridad % 8 == 6) {
-                    mvprintw(4, 1, "Xx_ermutePr_xX");
-                    opciones[3] = "Xx_ermutePr_xX";
-                } else if (paridad % 8 == 7) {
-                    mvprintw(4, 1, "Xx_ermuterP_xX");
-                    opciones[3] = "Xx_ermuterP_xX";
-                }
+                const char *texto = variantes[paridad % 8];
+                mvprintw(4, 1, texto);
+                opciones[3] = texto;
             }
+
             // CCP con colorinchis
             if (seleccion == 4) {
                 //attron(A_REVERSE);
