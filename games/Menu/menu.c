@@ -69,48 +69,48 @@ int main() {
     init_pair(2, COLOR_BLUE, -1);  // Para el color azul
     init_pair(3, COLOR_GREEN, -1); // Para el color verde
 
-    // Opciones del menú
-    char *opciones[] = {
-        "Need 4 Speed",
-        "Ahorcado",
-        "NIM",
-        "Xx_Permuter_xX",
-        "Colorea Como Puedas: Digital Edition 2024",
-        "MAZE",
-        "crazy flip it",
-        "Salir"
+    // Funcionalidades
+    char *variantes_permuter[] = { // para funcionalidad permuter
+        "Xx_Permuter_xX", "Xx_ePrmuter_xX", "Xx_erPmuter_xX", "Xx_ermPuter_xX",
+        "Xx_ermuPter_xX", "Xx_ermutPer_xX", "Xx_ermutePr_xX", "Xx_ermuterP_xX"
     };
+    int paridad = 0; // para mostrar permuter cambiando
 
-    char *nombres_juegos[] = {
-        "press_the_key",
-        "ahorcado",
-        "nim",
-        "permuter",
-        "ccp",
-        "maze",
-        "flip"
-    };
-    int opciones_len = sizeof(opciones) / sizeof(opciones[0]);
+    const char *n4s_text = "Need 4 Speed"; // para funcoinalidad N4S
+    int n4s_text_len = strlen(n4s_text);
+
+    // Opciones del menú
+    char *opciones[SALIR+1];
+    for (int i = 0; i < SALIR+1; i++) opciones[i] = (char*) malloc( STR_LEN * sizeof(char));
+    opciones[N4S]      = "Need 4 Speed";
+    opciones[AHORCADO] = "Ahorcado";
+    opciones[NIM]      = "NIM";
+    opciones[PERMUTER] = variantes_permuter[0];
+    opciones[CCP]      = "Colorea Como Puedas: Digital Edition 2024";
+    opciones[MAZE]     = "MAZE";
+    opciones[FLIPIT]   = "crazy flip it";
+    opciones[SALIR]    = "Salir";
+
+    char *nombres_juegos[SALIR];
+    for (int i = 0; i < SALIR; i++) nombres_juegos[i] = (char*) malloc( STR_LEN * sizeof(char));
+    nombres_juegos[N4S]      = "press_the_key";
+    nombres_juegos[AHORCADO] = "ahorcado";
+    nombres_juegos[NIM]      = "nim";
+    nombres_juegos[PERMUTER] = "permuter";
+    nombres_juegos[CCP]      = "ccp";
+    nombres_juegos[MAZE]     = "maze";
+    nombres_juegos[FLIPIT]   = "flip";
 
     char *ruta_juego = (char*) malloc(STR_LEN * sizeof(char));
 
     int seleccion = 0;
-    int opcion;
-    int paridad = 0; // para mostrar permuter cambiando
+    int user_input;
 
     inicioLetras();
     int term_size_x = getmaxx(stdscr);
     int to_right2 = (term_size_x - 42)/2;
     int term_size_y = getmaxy(stdscr);
     int to_down2 = (term_size_y - 1)/2;
-
-    char *variantes_permuter[] = { // para funcionalidad permuter
-        "Xx_Permuter_xX", "Xx_ePrmuter_xX", "Xx_erPmuter_xX", "Xx_ermPuter_xX",
-        "Xx_ermuPter_xX", "Xx_ermutPer_xX", "Xx_ermutePr_xX", "Xx_ermuterP_xX"
-    };
-
-    const char *n4s_text = "Need 4 Speed"; // para funcoinalidad N4S
-    int text_len = strlen(n4s_text);
 
     // Ciclo del menú
     while (1) {
@@ -128,7 +128,7 @@ int main() {
             // velocidad en need 4 speed
             case N4S:
                 attroff(A_REVERSE);
-                for (int i = 0; i < COLS - text_len; i = i + 10) {
+                for (int i = 0; i < COLS - n4s_text_len; i = i + 10) {
                     mvprintw(N4S+1, i, n4s_text);
                     refresh();
                     usleep(5000);
@@ -178,7 +178,7 @@ int main() {
 
             // MAZE mazed
             case MAZE:
-                mvprintw(MAZE+1, 1, "MAZE");
+                mvprintw(MAZE+1, 1, "|\\/| A Z E ");
                 break;
                 //attron(A_REVERSE);
                 /* mvprintw(3, 1, "NIM                _______________");
@@ -203,8 +203,8 @@ int main() {
         attroff(A_REVERSE);
         refresh(); // Actualizar la pantalla
 
-        opcion = getch(); // Capturar entrada del usuario
-        switch (opcion) {
+        user_input = getch(); // Capturar entrada del usuario
+        switch (user_input) {
             case 'k':
             case KEY_UP:
                 decrementar_var(seleccion, 0);
@@ -213,7 +213,7 @@ int main() {
 
             case 'j':
             case KEY_DOWN:
-                incrementar_var(seleccion, opciones_len-1);
+                incrementar_var(seleccion, SALIR);
                 if (seleccion == PERMUTER) paridad = (paridad+1) % 8; // para permuter
                 break;
 
@@ -224,7 +224,7 @@ int main() {
             case 'l':
             case '\n':
                 // Si la opción seleccionada es salir
-                if (seleccion == opciones_len-1) {
+                if (seleccion == SALIR) {
                     goto fin_partida;
                 }
 
