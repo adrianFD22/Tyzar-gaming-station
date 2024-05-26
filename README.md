@@ -7,3 +7,10 @@
 
 ## Instalación
 Para disfrutar de la **Tyzar gaming station**, descarga el repositorio y ejecuta ```make install```. Para jugar ejecuta ```./tgs```.
+
+## TODO
+- Flipit
+    - tiene que cerrar el file descriptor
+    - se peta cuando le pides que cargue un directorio
+    - la parte de leer un fichero va como el ojete
+    - error de que fichero no existe
