@@ -3,23 +3,14 @@
 #include <ncurses.h>
 #include <locale.h>   // para caracteres especiales
 #include <unistd.h>   // para sleep() / usleep()
-
+#include "games.h"
 
 #define COMPILE_DIR "compiled/"
 #define STR_LEN 100
 #define incrementar_var(x, top) (x) = (x) + 1 <= (top) ? (x) + 1 : (x)
 #define decrementar_var(x, bottom) (x) = (x) - 1 >= (bottom) ? (x) - 1 : (x)
 
-enum game {
-    N4S,
-    AHORCADO,
-    NIM,
-    PERMUTER,
-    CCP,
-    MAZE,
-    FLIPIT,
-    SALIR
-};
+#define printopt(opt, x, string) mvprintw(center_y - NUM_GAMES/2 + (opt), center_x + (x), (string)) // Prints the given game centered in the menu
 
 void inicioLetras() {
     int term_size_x = getmaxx(stdscr);   // para centrar
@@ -80,8 +71,8 @@ int main() {
     int n4s_text_len = strlen(n4s_text);
 
     // Opciones del menú
-    char *opciones[SALIR+1];
-    for (int i = 0; i < SALIR+1; i++) opciones[i] = (char*) malloc( STR_LEN * sizeof(char));
+    char *opciones[NUM_GAMES];
+    for (int i = 0; i < NUM_GAMES; i++) opciones[i] = (char*) malloc( STR_LEN * sizeof(char));
     opciones[N4S]      = "Need 4 Speed";
     opciones[AHORCADO] = "Ahorcado";
     opciones[NIM]      = "NIM";
@@ -91,8 +82,8 @@ int main() {
     opciones[FLIPIT]   = "crazy flip it";
     opciones[SALIR]    = "Salir";
 
-    char *nombres_juegos[SALIR];
-    for (int i = 0; i < SALIR; i++) nombres_juegos[i] = (char*) malloc( STR_LEN * sizeof(char));
+    char *nombres_juegos[NUM_GAMES-1];
+    for (int i = 0; i < NUM_GAMES-1; i++) nombres_juegos[i] = (char*) malloc( STR_LEN * sizeof(char));
     nombres_juegos[N4S]      = "press_the_key";
     nombres_juegos[AHORCADO] = "ahorcado";
     nombres_juegos[NIM]      = "nim";
@@ -107,18 +98,29 @@ int main() {
     int user_input;
 
     inicioLetras();
-    int term_size_x = getmaxx(stdscr);
-    int to_right2 = (term_size_x - 42)/2;
-    int term_size_y = getmaxy(stdscr);
-    int to_down2 = (term_size_y - 1)/2;
+    int term_size_x;
+    int center_x;
+    int term_size_y;
+    int center_y;
 
     // Ciclo del menú
     while (1) {
+        term_size_x = getmaxx(stdscr);
+        center_x    = term_size_x/2;
+        term_size_y = getmaxy(stdscr);
+        center_y    = term_size_y/2;
+
         // Limpiar pantalla y mostrar opciones
         clear();
+
+        for (int i = 0; i < 6; i++) {
+            printopt(i + NUM_GAMES/2 -3, -30, icons[seleccion][i]);
+        }
+
         for (int i = 0; i < 8; i++) {
             if (seleccion != i) {
-                mvprintw(i + 1, 1, "%s", opciones[i]);
+                //mvprintw(i + 1, 1, "%s", opciones[i]);
+                printopt(i, 0, opciones[i]);
             }
         }
 
@@ -128,20 +130,24 @@ int main() {
             // velocidad en need 4 speed
             case N4S:
                 attroff(A_REVERSE);
-                for (int i = 0; i < COLS - n4s_text_len; i = i + 10) {
-                    mvprintw(N4S+1, i, n4s_text);
+                for (int i = 0; i < center_x - n4s_text_len; i = i + 10) {
+                    //mvprintw(N4S+1, i, n4s_text);
+                    printopt(N4S, i, n4s_text);
                     refresh();
-                    usleep(5000);
-                    mvprintw(1, i, "             ");
+                    usleep(30000);
+                    //mvprintw(1, i, "             ");
+                    printopt(N4S, i, "             ");
                 }
                 attron(A_REVERSE);
-                mvprintw(N4S+1, 1, n4s_text); // Posición final
+                //mvprintw(N4S+1, 1, n4s_text); // Posición final
+                printopt(N4S, 0, n4s_text); // Posición final
                 break;
 
             // ahorcado tipografía del infierno
             case AHORCADO:
                 attron(COLOR_PAIR(1));
-                mvprintw(AHORCADO+1, 1, "คђ๏гςค๔๏");
+                //mvprintw(AHORCADO+1, 1, "คђ๏гςค๔๏");
+                printopt(AHORCADO, 0, "คђ๏гςค๔๏");
                 //mvprintw(2, 1, "ą̴̰̤̹͚̗̑͊̆̊h̵̠̟̤̱̳͙̬͇͋͗̓̚o̸͈̣̲͗̂͋̔̓̿̔́̇͘̚͝ŗ̵̛̛̠͕̩̜̦͔̦̩̻͚͒̽͋̀̾͆̊̚͘c̸̢̫̠͎̬̖͎̼̩͑̽̊̑̌͆́̋̊̎̕̕͝͠ą̸͈̪̫̰͇̻̺̈́̒̓͒́͛̎͒͛̆͜͠d̷̟̗̙̰̲̅͐̈́̓̚̚͝o̵̡̡̳̜̟̻͙͎͋͂̄̂̀̊̇̍̿͆̂̌̾̄");
                 attroff(COLOR_PAIR(1));
                 break;
@@ -149,36 +155,39 @@ int main() {
             // NIM parpadeante
             case NIM:
                 attron(A_BLINK);
-                mvprintw(NIM+1, 1, "NIM");
+                //mvprintw(NIM+1, 1, "NIM");
+                printopt(NIM, 0, "NIM");
                 attroff(A_BLINK);
                 break;
 
             // Permutter permutado, secuencia de permutaciones
             case PERMUTER:
-                mvprintw(PERMUTER+1, 1, variantes_permuter[paridad]);
+                //mvprintw(PERMUTER+1, 1, variantes_permuter[paridad]);
+                printopt(PERMUTER, 0, variantes_permuter[paridad]);
                 opciones[3] = variantes_permuter[paridad];
                 break;
 
             // CCP con colorinchis
             case CCP:
                 attroff(A_REVERSE);
-                attron(COLOR_PAIR(1));      mvprintw(5, 1, "Colorea");
-                attroff(COLOR_PAIR(1));     mvprintw(5, 8, "--");
-                attron(COLOR_PAIR(2));      mvprintw(5, 10, "Como");
-                attroff(COLOR_PAIR(2));     mvprintw(5, 14, "--");
-                attron(COLOR_PAIR(3));      mvprintw(5, 16, "Puedas:");
-                attroff(COLOR_PAIR(3));     mvprintw(5, 23, "--");
-                attron(COLOR_PAIR(1));      mvprintw(5, 25, "Digital");
-                attroff(COLOR_PAIR(1));     mvprintw(5, 32, "--");
-                attron(COLOR_PAIR(2));      mvprintw(5, 34, "Edition");
-                attroff(COLOR_PAIR(2));     mvprintw(5, 41, "--");
-                attron(COLOR_PAIR(1));      mvprintw(5, 43, "2024");
+                attron(COLOR_PAIR(1));      printopt(CCP, 0, "Colorea");
+                attroff(COLOR_PAIR(1));     printopt(CCP, 7, "--");
+                attron(COLOR_PAIR(2));      printopt(CCP, 9, "Como");
+                attroff(COLOR_PAIR(2));     printopt(CCP, 13, "--");
+                attron(COLOR_PAIR(3));      printopt(CCP, 15, "Puedas:");
+                attroff(COLOR_PAIR(3));     printopt(CCP, 22, "--");
+                attron(COLOR_PAIR(1));      printopt(CCP, 24, "Digital");
+                attroff(COLOR_PAIR(1));     printopt(CCP, 31, "--");
+                attron(COLOR_PAIR(2));      printopt(CCP, 33, "Edition");
+                attroff(COLOR_PAIR(2));     printopt(CCP, 40, "--");
+                attron(COLOR_PAIR(1));      printopt(CCP, 42, "2024");
                 attroff(COLOR_PAIR(1));
                 break;
 
             // MAZE mazed
             case MAZE:
-                mvprintw(MAZE+1, 1, "|\\/| A Z E ");
+                //mvprintw(MAZE+1, 1, "|\\/| A Z E ");
+                printopt(MAZE, 0, "|\\/| A Z E ");
                 break;
                 //attron(A_REVERSE);
                 /* mvprintw(3, 1, "NIM                _______________");
@@ -192,11 +201,13 @@ int main() {
 
             // volver loca la opción crazy flip it
             case FLIPIT:
-                mvprintw(FLIPIT+1, 0, " ʇı dılɟ ʎzɐɹɔ");
+                //mvprintw(FLIPIT+1, 0, " ʇı dılɟ ʎzɐɹɔ");
+                printopt(FLIPIT, 0, "ʇı dılɟ ʎzɐɹɔ");
                 break;
 
             case SALIR:
-                mvprintw(SALIR+1, 1, "Salir");
+                //mvprintw(SALIR+1, 1, "Salir");
+                printopt(SALIR, 0, "Salir");
                 break;
         }
 
@@ -237,10 +248,12 @@ int main() {
 
                 clear();
                 refresh();
-                mvprintw(to_down2, to_right2, "Presiona cualquier tecla para continuar...");
+                //mvprintw(center_y, center_x, "Presiona cualquier tecla para continuar...");
+                printopt(0, -21, "Presiona cualquier tecla para continuar...");
                 getch(); // Esperar a que el usuario presione una tecla antes de volver al menú
                 break;
         }
+        // TODO: Vacíar el buffer de entrada del teclado
     }
 
     // Cerrar ncurses
