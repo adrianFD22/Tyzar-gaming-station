@@ -92,7 +92,7 @@ int main() {
     nombres_juegos[CCP]      = "ccp";
     nombres_juegos[MAZE]     = "maze";
     nombres_juegos[FLIPIT]   = "flip";
-    nombres_juegos[PONG]     = "Pong";
+    nombres_juegos[PONG]     = "pong";
 
     char *ruta_juego = (char*) malloc(STR_LEN * sizeof(char));
 
