@@ -28,12 +28,12 @@ const char icons[NUM_GAMES][6][64] = {
 
     // AHORCADO
     {
+        "          |---",
+        "          0",
+        "         -|-",
+        "          /\\",
         "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        "palabra: _ho_r_ca_o",
     },
 
     // NIM
