@@ -48,12 +48,12 @@ const char icons[NUM_GAMES][6][64] = {
 
     // PERMUTER
     {
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        " Xx     →    xX",
+        "      ↑  ↓",
+        " per  U  M  ter",
+        "      ↑  ↓",
+        "       ←",
+        "Xx            xX",
     },
 
     // CCP
