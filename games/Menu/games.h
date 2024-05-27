@@ -7,6 +7,7 @@ enum game {
     CCP,
     MAZE,
     FLIPIT,
+    PONG,
     SALIR,
     NUM_GAMES
 };
@@ -75,8 +76,8 @@ const char icons[NUM_GAMES][6][64] = {
         "|_____  |____   | _|",
         "|__________________ ",
     },
-
-    // FLIPIT
+    
+        // FLIPIT
     {
         "     _______________ ",
         "    |██  |████      |",
@@ -85,6 +86,17 @@ const char icons[NUM_GAMES][6][64] = {
         "    |██   ██      ██|",
         "    |_______________|",
     },
+
+    // PONG
+    {
+        " █   ●      ",
+        " █ ",
+        " █                █",
+        " █                █",
+        "                  █",
+        "                  █",
+    },
+    
 
     // SALIR
     {

@@ -80,6 +80,7 @@ int main() {
     opciones[CCP]      = "Colorea Como Puedas: Digital Edition 2024";
     opciones[MAZE]     = "MAZE";
     opciones[FLIPIT]   = "crazy flip it";
+    opciones[PONG]     = "Pong";
     opciones[SALIR]    = "Salir";
 
     char *nombres_juegos[NUM_GAMES-1];
@@ -91,6 +92,7 @@ int main() {
     nombres_juegos[CCP]      = "ccp";
     nombres_juegos[MAZE]     = "maze";
     nombres_juegos[FLIPIT]   = "flip";
+    nombres_juegos[PONG]     = "Pong";
 
     char *ruta_juego = (char*) malloc(STR_LEN * sizeof(char));
 
@@ -117,7 +119,7 @@ int main() {
             printopt(i + NUM_GAMES/2 -3, -30, icons[seleccion][i]);
         }
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 9; i++) {
             if (seleccion != i) {
                 //mvprintw(i + 1, 1, "%s", opciones[i]);
                 printopt(i, 0, opciones[i]);
@@ -160,7 +162,7 @@ int main() {
                 attroff(A_BLINK);
                 break;
 
-            // Permutter permutado, secuencia de permutaciones
+            // Permuter permutado, secuencia de permutaciones
             case PERMUTER:
                 //mvprintw(PERMUTER+1, 1, variantes_permuter[paridad]);
                 printopt(PERMUTER, 0, variantes_permuter[paridad]);
@@ -189,20 +191,15 @@ int main() {
                 //mvprintw(MAZE+1, 1, "|\\/| A Z E ");
                 printopt(MAZE, 0, "|\\/| A Z E ");
                 break;
-                //attron(A_REVERSE);
-                /* mvprintw(3, 1, "NIM                _______________");
-                mvprintw(4, 1, "Xx_Permuter_xX     | ↓ ← ← ← ← ← |");
-                mvprintw(5, 1, "Colorea Como Puedas: ↓ Digital ↑ Edition 2024");
-                mvprintw(6, 1, "MAZE     ← ← ← ← ← | ↓ |     | ↑ ←  #");
-                mvprintw(7, 1, "crazy flip it ˉ| ↑ ← ← |     ˉˉˉˉˉˉˉˉˉ");
-                mvprintw(8, 1, "Salir          ˉˉˉˉˉˉˉˉˉ");
-                attron(A_REVERSE);
-                mvprintw(6, 1, "MAZE"); */
 
             // volver loca la opción crazy flip it
             case FLIPIT:
                 //mvprintw(FLIPIT+1, 0, " ʇı dılɟ ʎzɐɹɔ");
                 printopt(FLIPIT, 0, "ʇı dılɟ ʎzɐɹɔ");
+                break;
+
+            case PONG:
+                printopt(PONG, 0, "P● ng");
                 break;
 
             case SALIR:
