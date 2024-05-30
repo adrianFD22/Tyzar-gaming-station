@@ -175,6 +175,33 @@ int select_difficulty(int *paddle_height, int *ball_delay) {
     }
 }
 
+// Inicio
+void inicioLetras() {
+    clear();
+    
+    mvprintw(LINES/2 - 8, COLS/2 - 25, "██    \\");
+    mvprintw(LINES/2 - 7, COLS/2 - 25, "██  \\   ");
+    mvprintw(LINES/2 - 6, COLS/2 - 25, "██    \\      \\  \\");
+    mvprintw(LINES/2 - 5, COLS/2 - 25, "██  \\      \\  \\");
+    mvprintw(LINES/2 - 4, COLS/2 - 25, "██       \\      \\");
+    mvprintw(LINES/2 - 3, COLS/2 - 25, "██            \\   \\");
+    mvprintw(LINES/2 - 2, COLS/2 - 25, "      //////    ██████    //   //   //////");
+    mvprintw(LINES/2 - 1, COLS/2 - 25, "      //  //   ████████   ///  //   //");
+    mvprintw(LINES/2, COLS/2 - 25,     "      //////  ██████████  // / //   // ///    ██");
+    mvprintw(LINES/2 + 1, COLS/2 - 25, "      //       ████████   //  ///   //  //    ██");
+    mvprintw(LINES/2 + 2, COLS/2 - 25, "      //        ██████    //   //   //////    ██");
+    mvprintw(LINES/2 + 3, COLS/2 - 25, "                                              ██");
+    mvprintw(LINES/2 + 4, COLS/2 - 25, "                                              ██");
+    mvprintw(LINES/2 + 5, COLS/2 - 25, "                                              ██");
+
+    mvprintw(LINES/2 + 5, COLS/2 - 25, "Pulsa cualquier tecla para continuar...");
+
+    refresh();
+    usleep(100000);
+    getchar(); // Esperar a que el usuario presione una tecla antes de continuar
+    clear();
+}
+
 int main() {
     Paddle paddle1, paddle2;
     Ball ball;
@@ -193,6 +220,8 @@ int main() {
     keypad(stdscr, TRUE);   // activar las flechas del teclado
     timeout(0);
     srand(time(NULL));      // inicializar números aleatorios
+
+    inicioLetras();
 
     // Salir si no se elige dificultad
     if (select_difficulty(&paddle_height, &ball_delay) == 1) {
@@ -253,14 +282,14 @@ int main() {
             mvprintw(LINES / 2, COLS / 2 - 10, "Punto para el Jugador 2!");
             refresh();
             usleep(1000000);
-            getchar(); // Pausa y espera a que el jugador presione una tecla
+            getchar(); 
             init_ball(&ball, COLS / 2, (rand() % (LINES - 4)) + 3, ball_delay); // Reposiciona la pelota
         } else if (point == 2) {
             score1++;
             mvprintw(LINES / 2, COLS / 2 - 10, "Punto para el Jugador 1!");
             refresh();
             usleep(1000000);
-            getchar(); // Pausa y espera a que el jugador presione una tecla
+            getchar();
             init_ball(&ball, COLS / 2, LINES / 2, ball_delay); // Reposiciona la pelota
         }
 

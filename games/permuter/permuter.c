@@ -46,6 +46,35 @@ void reset() {
     fclose(archivo);
 }
 
+// Inicio
+void inicioLetras() {
+    
+    mvprintw(LINES/2 - 11, COLS/2 - 18, "//////    //////    //////    //  //");
+    mvprintw(LINES/2 - 10, COLS/2 - 18, "//  //    //        //  //    / // /");
+    mvprintw(LINES/2 - 9, COLS/2 - 18, "//////    ////      /////     / // /");
+    mvprintw(LINES/2 - 8, COLS/2 - 18, "//        //        //  //    /    /");
+    mvprintw(LINES/2 - 7, COLS/2 - 18, "//        //////    //   /    /    /");
+
+    mvprintw(LINES/2 - 5, COLS/2 - 19, "XXX      XXX              XXX      XXX");
+    mvprintw(LINES/2 - 4, COLS/2 - 19, " XXX    XXX    XX    XX    XXX    XXX");
+    mvprintw(LINES/2 - 3, COLS/2 - 19, "  XXX  XXX      XX  XX      XXX  XXX");
+    mvprintw(LINES/2 - 2, COLS/2 - 19, "   XXXXXX        XXXX        XXXXXX");
+    mvprintw(LINES/2 - 1, COLS/2 - 19, "  XXX  XXX      XX  XX      XXX  XXX");
+    mvprintw(LINES/2 + 0, COLS/2 - 19, " XXX    XXX    XX    XX    XXX    XXX");
+    mvprintw(LINES/2 + 1, COLS/2 - 19, "XXX      XXX              XXX      XXX");
+
+    mvprintw(LINES/2 + 3, COLS/2 - 18, "//  //    //////    //////    //////");
+    mvprintw(LINES/2 + 4, COLS/2 - 18, "//  //      //      //        //  //");
+    mvprintw(LINES/2 + 5, COLS/2 - 18, "//  //      //      ////      ///// ");
+    mvprintw(LINES/2 + 6, COLS/2 - 18, "//  //      //      //        //  //");
+    mvprintw(LINES/2 + 7, COLS/2 - 18, "//////      //      //////    //   /");
+
+    mvprintw(LINES/2 + 10, COLS/2 - 19, "Pulsa cualquier tecla para continuar...");
+    refresh();
+    getch(); // Esperar a que el usuario presione una tecla antes de continuar
+    clear();
+}
+
 //Función para seleccionar la dificultad
 int selec() {
     clear();
@@ -219,6 +248,8 @@ int main() {
     int to_right = (term_size_x - 15)/2;
     int term_size_y = getmaxy(stdscr);  
     int to_down = (term_size_y)/2;
+
+    inicioLetras();
 
     int dificultad = selec();
     int numeros[dificultad];
