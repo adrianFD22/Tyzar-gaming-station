@@ -130,73 +130,6 @@ void draw_score(int score1, int score2) {
     }
 }
 
-
-/*
-void draw_score(int score1, int score2) {
-    if (score1 < 10 && score2 < 10) {
-        mvprintw(0, COLS / 2 - 7, "____________");
-        mvprintw(2, COLS / 2 - 20, "J1: w/s      █ %d  VS  %d █      J2: ↑/↓", score1, score2);
-        char techo[COLS + 1];       // +1 para el carácter nulo de final de cadena
-        memset(techo, '_', COLS);   // Para llenar la fila de '_'
-        techo[COLS] = '\0';         // Agrega el carácter nulo al final de la cadena
-        mvprintw(3, 0, "%s", techo);
-        mvprintw(3, COLS / 2 - 7, "█__________█");
-        if (score1 > score2) {
-            mvprintw(1, COLS / 2 - 7, "█ ★        █");
-        } else if (score2 > score1) {
-            mvprintw(1, COLS / 2 - 7, "█        ★ █");
-        } else {
-            mvprintw(1, COLS / 2 - 7, "█          █");
-        }
-    } else if (score1 > 9 && score2 < 10) {
-        mvprintw(0, COLS / 2 - 8, "______________");
-        mvprintw(2, COLS / 2 - 21, "J1: w/s      █ %d   VS  %d █      J2: ↑/↓", score1, score2);
-        char techo[COLS + 1];       // +1 para el carácter nulo de final de cadena
-        memset(techo, '_', COLS);   // Para llenar la fila de '_'
-        techo[COLS] = '\0';         // Agrega el carácter nulo al final de la cadena
-        mvprintw(3, 0, "%s", techo);
-        mvprintw(3, COLS / 2 - 8, "█____________█");
-        if (score1 > score2) {
-            mvprintw(1, COLS / 2 - 8, "█ ★          █");
-        } else if (score2 > score1) {
-            mvprintw(1, COLS / 2 - 8, "█          ★ █");
-        } else {
-            mvprintw(1, COLS / 2 - 8, "█            █");
-        }
-    } else if (score2 > 9 && score1 < 10) {
-        mvprintw(0, COLS / 2 - 8, "______________");
-        mvprintw(2, COLS / 2 - 21, "J1: w/s      █ %d   VS  %d █      J2: ↑/↓", score1, score2);
-        char techo[COLS + 1];       // +1 para el carácter nulo de final de cadena
-        memset(techo, '_', COLS);   // Para llenar la fila de '_'
-        techo[COLS] = '\0';         // Agrega el carácter nulo al final de la cadena
-        mvprintw(3, 0, "%s", techo);
-        mvprintw(3, COLS / 2 - 8, "█____________█");
-        if (score1 > score2) {
-            mvprintw(1, COLS / 2 - 8, "█ ★          █");
-        } else if (score2 > score1) {
-            mvprintw(1, COLS / 2 - 8, "█          ★ █");
-        } else {
-            mvprintw(1, COLS / 2 - 8, "█            █");
-        }
-    } else {
-        mvprintw(0, COLS / 2 - 8, "_______________");
-        mvprintw(2, COLS / 2 - 21, "J1: w/s      █ %d   VS  %d █      J2: ↑/↓", score1, score2);
-        char techo[COLS + 1];       // +1 para el carácter nulo de final de cadena
-        memset(techo, '_', COLS);   // Para llenar la fila de '_'
-        techo[COLS] = '\0';         // Agrega el carácter nulo al final de la cadena
-        mvprintw(3, 0, "%s", techo);
-        mvprintw(3, COLS / 2 - 8, "█_____________█");
-        if (score1 > score2) {
-            mvprintw(1, COLS / 2 - 8, "█  ★          █");
-        } else if (score2 > score1) {
-            mvprintw(1, COLS / 2 - 8, "█          ★  █");
-        } else {
-            mvprintw(1, COLS / 2 - 8, "█             █");
-        }
-    }
-}
-*/
-
 // Selector de dificultad antes de empezar, afecta a la velocidad y el tamaño de las palas
 int select_difficulty(int *paddle_height, int *ball_delay) {
     char *choices[] = {"1. Fácil", "2. Normal", "3. Difícil"};
@@ -319,12 +252,14 @@ int main() {
             score2++;
             mvprintw(LINES / 2, COLS / 2 - 10, "Punto para el Jugador 2!");
             refresh();
+            usleep(1000000);
             getchar(); // Pausa y espera a que el jugador presione una tecla
             init_ball(&ball, COLS / 2, (rand() % (LINES - 4)) + 3, ball_delay); // Reposiciona la pelota
         } else if (point == 2) {
             score1++;
             mvprintw(LINES / 2, COLS / 2 - 10, "Punto para el Jugador 1!");
             refresh();
+            usleep(1000000);
             getchar(); // Pausa y espera a que el jugador presione una tecla
             init_ball(&ball, COLS / 2, LINES / 2, ball_delay); // Reposiciona la pelota
         }
