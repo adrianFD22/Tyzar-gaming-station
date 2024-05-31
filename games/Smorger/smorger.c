@@ -53,13 +53,13 @@
 #define HEIGHT 20   // Intentar que sean pares para no marearnos al dividir cuando haya que centrar la pantalla
 
 // Estilo. Caracteres que representan cada entidad de la sala
-#define WALL "##"
+#define WALL "##"   // Igual podemos poner caracteres sólidos
 #define DOOR "  "
 
 // Distintas orientaciones del smorger-hero, sujeto a ideas
-#define PLAYER_UP "^|"
-#define PLAYER_DOWN "|v"
-#define PLAYER_LEFT "<-"
+#define PLAYER_UP    "^|"
+#define PLAYER_DOWN  "|v"
+#define PLAYER_LEFT  "<-"
 #define PLAYER_RIGHT "->"
 #define UP      0
 #define LEFT    1
@@ -70,7 +70,6 @@ struct player {
     int position[2];    // Coordenadas del jugador
     int orientation;    // Hacia donde mira (UP, LEFT, DOWN, RIGHT)
     int color;          // Color del personaje
-    // Lista de powerups (winkies)
     char** winkies;     // Lista de powerups llamados winkies
     int winkies_count;  // Número de winkies que tiene el jugador
 };
