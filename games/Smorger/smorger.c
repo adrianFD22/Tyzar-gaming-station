@@ -1,4 +1,3 @@
-
 // Smorger: un juego sobre explorar una mazmorra. Aún está por desarrollar la idea.
 // El funcionamiento de cada sala es: todo se mueve cuando el jugador se mueve.
 
@@ -33,17 +32,32 @@
 //      "objetos" del mismo struct. Creo que no es buena idea porque el jugador
 //      podría tener cosas como "munición" que los enemigos no.
 
+//NOTAS DIEGO:
+// - Powerups llamados winkies que hagan cosas, tal vez acumulables como en el isaac.
+// - He puesto un marquito para saber las dimensiones de la sala, que tendrá que ser un tamaño fijo.
+//      Actualización: igual quito el marquito porque me está molestando con las puertas, descubrirás de qué
+//      hablo en las notas de abajo, te me cuidas makina un salu2.
+// - El movimiento del personaje va en una ventana distinta de ncurses para no tener que referscar todo.
+// - Implementadas las orientciones del movimiento del smorger.
+// - No sé por que no se ven las puertas de las salas y no se puede cruzar jeje, en realidad al cruzar 
+//      la puerta (cuando se arregle el bug) solo apareces por la puerta contraria, hay que mejorarlo para
+//      que se tenga en cuenta que cada sala es diferente con bjetos y eso.
+
 #include <ncurses.h>
 #include <stdlib.h>
-
 
 #define WIDTH 40    // Dimensiones de cada sala (en principio todas las salas tienen el mismo tamaño)
 #define HEIGHT 20   // Intentar que sean pares para no marearnos al dividir cuando haya que centrar la pantalla
 
 // Estilo. Caracteres que representan cada entidad de la sala
 #define WALL "##"
-#define PLAYER "|-"
+#define DOOR "  "
 
+// Distintas orientaciones del smorger-hero, sujeto a ideas
+#define PLAYER_UP "^|"
+#define PLAYER_DOWN "|v"
+#define PLAYER_LEFT "<-"
+#define PLAYER_RIGHT "->"
 #define UP      0
 #define LEFT    1
 #define DOWN    2
@@ -53,30 +67,57 @@ struct player {
     int position[2];    // Coordenadas del jugador
     int orientation;    // Hacia donde mira (UP, LEFT, DOWN, RIGHT)
     int color;          // Color del personaje
-
-    // ...
-    // Más movidas que harán el juego smórgico!
+    // Lista de powerups (winkies)
+    char** winkies;     // Lista de powerups llamados winkies
+    int winkies_count;  // Número de winkies que tiene el jugador
 };
 typedef struct player player;
 
-void print_room(int** room, player user);
+void print_room(WINDOW* win, int** room, player user);
 int** generate_room();
-
+void handle_input(player* user, int input, int** room);
+void print_player(WINDOW* win, player user, int corner_y, int corner_x);
+void change_room(player* user, int direction);
 
 int main() {
     int **room;
-    player user;    // Este nombre no me gusta para la variable user xd
+    player user;    // Este nombre no me gusta para la variable user xd 
+                    // Yo propongo smorger-hero
+
+    // Inicializar la lista de winkies, se irán recogiendo por el mapa
+    user.winkies = NULL;
+    user.winkies_count = 0;
 
     initscr();
     curs_set(0);
+    keypad(stdscr, TRUE); // Permite el uso de las teclas de flecha
+    noecho();             // No muestra los caracteres mientras se escriben
+
+    // Crear una nueva ventana para el movimiento del smorger-hero
+    WINDOW* win = newwin(HEIGHT + 2, WIDTH * 2 + 4, 1, (COLS - WIDTH * 2) / 2);
+    box(win, 0, 0);
+    wrefresh(win);
 
     // Provisional para probar el imprimir pantalla
     room = generate_room();
-    user.position[0] = WIDTH/2;
-    user.position[1] = HEIGHT/2;
+    user.position[0] = WIDTH / 2;
+    user.position[1] = HEIGHT / 2;
 
-    print_room(room, user);
-    getch();
+    int ch;
+    while ((ch = getch()) != 'q') { // Presiona 'q' para salir
+        handle_input(&user, ch, room);
+        // Detectar si el smorger-hero cruza una puerta y cambiar de sala
+        if (user.position[1] == -1 && user.position[0] == WIDTH / 2) {
+            change_room(&user, UP);
+        } else if (user.position[1] == HEIGHT && user.position[0] == WIDTH / 2) {
+            change_room(&user, DOWN);
+        } else if (user.position[0] == -1 && user.position[1] == HEIGHT / 2) {
+            change_room(&user, LEFT);
+        } else if (user.position[0] == WIDTH && user.position[1] == HEIGHT / 2) {
+            change_room(&user, RIGHT);
+        }
+        print_room(win, room, user);
+    }
 
     endwin();
 
@@ -88,45 +129,124 @@ int** generate_room() {
     int **room;
 
     // Inicializar la sala sin paredes
-    room = (int**) malloc(HEIGHT * sizeof(int**));
+    room = (int**) malloc(HEIGHT * sizeof(int*));
     for (int row = 0; row < HEIGHT; row++) {
-        room[row] = (int*) calloc(WIDTH, sizeof(int*));
+        room[row] = (int*) calloc(WIDTH, sizeof(int));
     }
 
     return room;
 }
 
+// Maneja la entrada del usuario y mueve al smorger-hero
+void handle_input(player* user, int input, int** room) {
+    int new_x = user->position[0];
+    int new_y = user->position[1];
+
+    switch(input) {
+        case KEY_UP:  // Ponte el modo vim como tú quieras
+            new_y--;
+            user->orientation = UP;
+            break;
+        case KEY_DOWN:
+            new_y++;
+            user->orientation = DOWN;
+            break;
+        case KEY_LEFT:
+            new_x--;
+            user->orientation = LEFT;
+            break;
+        case KEY_RIGHT:
+            new_x++;
+            user->orientation = RIGHT;
+            break;
+    }
+
+    // Verificar si el nuevo movimiento es válido (no hay colisión con una pared)
+    if (new_x >= 0 && new_x < WIDTH && new_y >= 0 && new_y < HEIGHT) {
+        // Permitir el movimiento si es una puerta o no es el borde
+        if ((new_y == 0 && new_x == WIDTH / 2) || (new_y == HEIGHT - 1 && new_x == WIDTH / 2) ||
+            (new_x == 0 && new_y == HEIGHT / 2) || (new_x == WIDTH - 1 && new_y == HEIGHT / 2) ||
+            room[new_y][new_x] == 0) {
+            user->position[0] = new_x;
+            user->position[1] = new_y;
+        }
+    }
+}
+
+// Cambia de sala cuando el smorger-hero cruza una puerta, en realidad solo te pone en 
+// la puerta contraria, ya se cambiará
+void change_room(player* user, int direction) {
+    switch(direction) {
+        case UP:
+            user->position[1] = HEIGHT - 1;
+            break;
+        case DOWN:
+            user->position[1] = 0;
+            break;
+        case LEFT:
+            user->position[0] = WIDTH - 1;
+            break;
+        case RIGHT:
+            user->position[0] = 0;
+            break;
+    }
+}
+
 // Muestra la sala. Cada coordenada se muestra como dos caracteres. Esta función también
 // se encargará de mostrar los demás objetos (jugador, enemigos, proyectiles...)
-void print_room(int** room, player user) {
+void print_room(WINDOW* win, int** room, player user) {
     int corner_x, corner_y;
 
-    corner_y = (getmaxy(stdscr)/2) - HEIGHT/2;     // La esquina superior...
-    corner_x = (getmaxx(stdscr)/2) - WIDTH;        // izquierda (cada coordenada son dos caracteres)
+    corner_y = 1; // La esquina superior dentro de la ventana win
+    corner_x = 2; // Dejar espacio para el borde de la ventana
+
+    // Limpiar la ventana antes de redibujar
+    werase(win);
+    box(win, 0, 0);
+
+    // Mostrar la lista de winkies en la parte superior de la pantalla principal
+    mvprintw(0, 0, "Winkies: ");
+    for (int i = 0; i < user.winkies_count; i++) {
+        printw("%s ", user.winkies[i]);
+    }
 
     // -----------
     //    Sala
     // -----------
-    // Muestra los bordes de la sala
-    for (int row = -1; row < HEIGHT+1; row++) {
-        mvprintw(corner_y + row, corner_x-2, WALL);
-        mvprintw(corner_y + row, corner_x+2*WIDTH, WALL);
-    }
-    for (int col = -1; col < WIDTH+1; col++) {
-        mvprintw(corner_y-1, corner_x + 2*col, WALL);
-        mvprintw(corner_y+HEIGHT, corner_x + 2*col, WALL);
-    }
-
-    // Muestra cada coordenada con las paredes pertinentes
+    // Muestra los bordes de la sala dentro de la ventana y añade puertas
     for (int row = 0; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
-            if (room[row][col] == 1) mvprintw(corner_y+row, corner_x+2*col, WALL);
+            if ((row == 0 && col == WIDTH / 2) || (row == HEIGHT - 1 && col == WIDTH / 2) ||
+                (col == 0 && row == HEIGHT / 2) || (col == WIDTH - 1 && row == HEIGHT / 2)) {
+                mvwprintw(win, corner_y + row, corner_x + 2 * col, DOOR);
+            } else if (room[row][col] == 1) {
+                mvwprintw(win, corner_y + row, corner_x + 2 * col, WALL);
+            }
         }
     }
 
     // -----------
     //    Player
     // -----------
-    mvprintw(corner_y + user.position[1], corner_x + 2*user.position[0], PLAYER);
+    print_player(win, user, corner_y, corner_x);
 
+    wrefresh(win); // Actualiza la ventana con los nuevos cambios
+}
+
+// Imprime el jugador con la orientación adecuada
+void print_player(WINDOW* win, player user, int corner_y, int corner_x) {
+    switch(user.orientation) {
+        case UP:
+            mvwprintw(win, corner_y + user.position[1], corner_x + 2 * user.position[0], PLAYER_UP);
+            break;
+        case DOWN:
+            mvwprintw(win, corner_y + user.position[1], corner_x + 2 * user.position[0], PLAYER_DOWN);
+            break;
+        case LEFT:
+            mvwprintw(win, corner_y + user.position[1], corner_x + 2 * user.position[0], PLAYER_LEFT);
+            break;
+        case RIGHT:
+            mvwprintw(win, corner_y + user.position[1], corner_x + 2 * user.position[0], PLAYER_RIGHT);
+            break;
+    }
 }
