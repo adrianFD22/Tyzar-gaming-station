@@ -179,12 +179,12 @@ int select_difficulty(int *paddle_height, int *ball_delay) {
 void inicioLetras() {
     clear();
     
-    mvprintw(LINES/2 - 8, COLS/2 - 25, "██    \\");
-    mvprintw(LINES/2 - 7, COLS/2 - 25, "██  \\   ");
-    mvprintw(LINES/2 - 6, COLS/2 - 25, "██    \\      \\  \\");
-    mvprintw(LINES/2 - 5, COLS/2 - 25, "██  \\      \\  \\");
-    mvprintw(LINES/2 - 4, COLS/2 - 25, "██       \\      \\");
-    mvprintw(LINES/2 - 3, COLS/2 - 25, "██            \\   \\");
+    mvprintw(LINES/2 - 8, COLS/2 - 25, "██");
+    mvprintw(LINES/2 - 7, COLS/2 - 25, "██");
+    mvprintw(LINES/2 - 6, COLS/2 - 25, "██");
+    mvprintw(LINES/2 - 5, COLS/2 - 25, "██");
+    mvprintw(LINES/2 - 4, COLS/2 - 25, "██");
+    mvprintw(LINES/2 - 3, COLS/2 - 25, "██");
     mvprintw(LINES/2 - 2, COLS/2 - 25, "      //////    ██████    //   //   //////");
     mvprintw(LINES/2 - 1, COLS/2 - 25, "      //  //   ████████   ///  //   //");
     mvprintw(LINES/2, COLS/2 - 25,     "      //////  ██████████  // / //   // ///    ██");
