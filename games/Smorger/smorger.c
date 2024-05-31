@@ -42,6 +42,9 @@
 // - No sé por que no se ven las puertas de las salas y no se puede cruzar jeje, en realidad al cruzar 
 //      la puerta (cuando se arregle el bug) solo apareces por la puerta contraria, hay que mejorarlo para
 //      que se tenga en cuenta que cada sala es diferente con bjetos y eso.
+// - He quitado el marquito ese de mierda y en su lugar hay '##'
+// - Quiero aprovechar el espacio fuera de la sala en la terminal para poner cosas como info del smorger-hero 
+//       o los winkies (me ha encantado escribir esta frase)
 
 #include <ncurses.h>
 #include <stdlib.h>
@@ -94,8 +97,7 @@ int main() {
     noecho();             // No muestra los caracteres mientras se escriben
 
     // Crear una nueva ventana para el movimiento del smorger-hero
-    WINDOW* win = newwin(HEIGHT + 2, WIDTH * 2 + 4, 1, (COLS - WIDTH * 2) / 2);
-    box(win, 0, 0);
+    WINDOW* win = newwin(HEIGHT, WIDTH * 2, (LINES - HEIGHT) / 2, (COLS - WIDTH * 2) / 2);
     wrefresh(win);
 
     // Provisional para probar el imprimir pantalla
@@ -105,18 +107,19 @@ int main() {
 
     int ch;
     while ((ch = getch()) != 'q') { // Presiona 'q' para salir
-        handle_input(&user, ch, room);
-        // Detectar si el smorger-hero cruza una puerta y cambiar de sala
-        if (user.position[1] == -1 && user.position[0] == WIDTH / 2) {
-            change_room(&user, UP);
-        } else if (user.position[1] == HEIGHT && user.position[0] == WIDTH / 2) {
-            change_room(&user, DOWN);
-        } else if (user.position[0] == -1 && user.position[1] == HEIGHT / 2) {
-            change_room(&user, LEFT);
-        } else if (user.position[0] == WIDTH && user.position[1] == HEIGHT / 2) {
-            change_room(&user, RIGHT);
-        }
-        print_room(win, room, user);
+    handle_input(&user, ch, room);
+
+    // Detectar si el smorger-hero cruza una puerta y cambiar de sala
+    if (user.position[1] == 0 && user.position[0] == WIDTH / 2) {
+        change_room(&user, UP);
+    } else if (user.position[1] == HEIGHT - 1 && user.position[0] == WIDTH / 2) {
+        change_room(&user, DOWN);
+    } else if (user.position[0] == 0 && user.position[1] == HEIGHT / 2) {
+        change_room(&user, LEFT);
+    } else if (user.position[0] == WIDTH - 1 && user.position[1] == HEIGHT / 2) {
+        change_room(&user, RIGHT);
+    }
+    print_room(win, room, user);
     }
 
     endwin();
@@ -124,7 +127,7 @@ int main() {
     return 0;
 }
 
-// Genera las paredes de una sala. Provisional: genera todo sin paredes
+// Genera las paredes de una sala
 int** generate_room() {
     int **room;
 
@@ -134,10 +137,26 @@ int** generate_room() {
         room[row] = (int*) calloc(WIDTH, sizeof(int));
     }
 
+    // Añadir las paredes
+    for (int row = 0; row < HEIGHT; row++) {
+        room[row][0] = 1;
+        room[row][WIDTH - 1] = 1;
+    }
+    for (int col = 0; col < WIDTH; col++) {
+        room[0][col] = 1;
+        room[HEIGHT - 1][col] = 1;
+    }
+
+    // Añadir las puertas
+    room[0][WIDTH / 2] = 0;               // Puerta superior
+    room[HEIGHT - 1][WIDTH / 2] = 0;      // Puerta inferior
+    room[HEIGHT / 2][0] = 0;              // Puerta izquierda
+    room[HEIGHT / 2][WIDTH - 1] = 0;      // Puerta derecha
+
     return room;
 }
 
-// Maneja la entrada del usuario y mueve al smorger-hero
+// Maneja la entrada del usuario y mueve al smorger-hero (y a futuro los enemigos)
 void handle_input(player* user, int input, int** room) {
     int new_x = user->position[0];
     int new_y = user->position[1];
@@ -178,16 +197,24 @@ void handle_input(player* user, int input, int** room) {
 void change_room(player* user, int direction) {
     switch(direction) {
         case UP:
-            user->position[1] = HEIGHT - 1;
+            // El jugador cruza la puerta superior y aparece en la puerta inferior
+            user->position[1] = HEIGHT - 2; // Altura menos 2 para evitar sobreescribir la pared inferior
+            user->position[0] = WIDTH / 2;  // Centrado en la puerta
             break;
         case DOWN:
-            user->position[1] = 0;
+            // El jugador cruza la puerta inferior y aparece en la puerta superior
+            user->position[1] = 1;         // Justo debajo de la pared superior
+            user->position[0] = WIDTH / 2; // Centrado en la puerta
             break;
         case LEFT:
-            user->position[0] = WIDTH - 1;
+            // El jugador cruza la puerta izquierda y aparece en la puerta derecha
+            user->position[0] = WIDTH - 2;  // Anchura menos 2 para evitar sobreescribir la pared derecha
+            user->position[1] = HEIGHT / 2; // Centrado en la puerta
             break;
         case RIGHT:
-            user->position[0] = 0;
+            // El jugador cruza la puerta derecha y aparece en la puerta izquierda
+            user->position[0] = 1;          // Justo a la derecha de la pared izquierda
+            user->position[1] = HEIGHT / 2; // Centrado en la puerta
             break;
     }
 }
@@ -197,12 +224,11 @@ void change_room(player* user, int direction) {
 void print_room(WINDOW* win, int** room, player user) {
     int corner_x, corner_y;
 
-    corner_y = 1; // La esquina superior dentro de la ventana win
-    corner_x = 2; // Dejar espacio para el borde de la ventana
+    corner_y = 0; // Ajustado a la esquina superior de la ventana win
+    corner_x = 0; // Ajustado a la esquina superior de la ventana win
 
     // Limpiar la ventana antes de redibujar
     werase(win);
-    box(win, 0, 0);
 
     // Mostrar la lista de winkies en la parte superior de la pantalla principal
     mvprintw(0, 0, "Winkies: ");
@@ -216,10 +242,12 @@ void print_room(WINDOW* win, int** room, player user) {
     // Muestra los bordes de la sala dentro de la ventana y añade puertas
     for (int row = 0; row < HEIGHT; row++) {
         for (int col = 0; col < WIDTH; col++) {
+            // Mostrar las puertas
             if ((row == 0 && col == WIDTH / 2) || (row == HEIGHT - 1 && col == WIDTH / 2) ||
                 (col == 0 && row == HEIGHT / 2) || (col == WIDTH - 1 && row == HEIGHT / 2)) {
                 mvwprintw(win, corner_y + row, corner_x + 2 * col, DOOR);
             } else if (room[row][col] == 1) {
+                // Mostrar las paredes
                 mvwprintw(win, corner_y + row, corner_x + 2 * col, WALL);
             }
         }
