@@ -116,27 +116,37 @@ void mostrarPath(char array[], int longitud, int posUsuario) {      // array no 
 
 // Manual de
 void instrucciones() {
-    initscr();
-    noecho();
+    int term_size_x = getmaxx(stdscr);   // Tamaño de la pantalla
+    int term_size_y = getmaxy(stdscr); 
 
-    mvprintw(0, 0, "Manual de instrucciones de Colorea Como Puedas: Digital Edition (2024)");
-    mvprintw(1, 0, "-------------------------------------------------------------------");
-    mvprintw(2, 0, "Movimiento:");
-    mvprintw(3, 0, "Derecha: 'l' o flecha derecha en el teclado");
-    mvprintw(4, 0, "Izquierda: 'h' o flecha izda en el teclado");
-    mvprintw(6, 0, "Tecla de acción: Pulsar 'k' o Enter en el teclado");
-    mvprintw(8, 0, "-------------------------------------------------------------------");
-    mvprintw(9, 0, "El objetivo de Colorea Como puedas es asignar un número a cada nodo");
-    mvprintw(10, 0, "del grafo con la tecla de acción, desplazándonos por el mismo con");
-    mvprintw(11, 0, "las teclas de movimiento. El número asignado al nodo será siempre");
-    mvprintw(12, 0, "el mínimo posible distinto del de sus vecinos.");
-    mvprintw(13, 0, "Un nodo vacío tiene número '0'");
-    mvprintw(14, 0, "Pierde el jugador que asigne el número 3 a un nodo o el  que asigna");
-    mvprintw(15, 0, "el número del último nodo disponible.");
+    // Crear una nueva ventana centrada
+    WINDOW *manual_win = newwin(term_size_y, term_size_x, 0, 0);
+    box(manual_win, 0, 0);  // Añadir un borde a la ventana
+    wrefresh(manual_win);
 
-    mvprintw(17, 0, "Pulsa cualquier tecla para volver a la partida...");
+    mvwprintw(manual_win, 1, 1, "Manual de instrucciones de Colorea Como Puedas: Digital Edition (2024)");
+    mvwprintw(manual_win, 2, 1, "-------------------------------------------------------------------");
+    mvwprintw(manual_win, 3, 1, "Movimiento:");
+    mvwprintw(manual_win, 4, 1, "Derecha: 'l' o flecha derecha en el teclado");
+    mvwprintw(manual_win, 5, 1, "Izquierda: 'h' o flecha izda en el teclado");
+    mvwprintw(manual_win, 7, 1, "Tecla de acción: Pulsar 'k' o Enter en el teclado");
+    mvwprintw(manual_win, 9, 1, "-------------------------------------------------------------------");
+    mvwprintw(manual_win, 10, 1, "El objetivo de Colorea Como puedas es asignar un número a cada nodo");
+    mvwprintw(manual_win, 11, 1, "del grafo con la tecla de acción, desplazándonos por el mismo con");
+    mvwprintw(manual_win, 12, 1, "las teclas de movimiento. El número asignado al nodo será siempre");
+    mvwprintw(manual_win, 13, 1, "el mínimo posible distinto del de sus vecinos.");
+    mvwprintw(manual_win, 14, 1, "Un nodo vacío tiene número '0'");
+    mvwprintw(manual_win, 15, 1, "Pierde el jugador que asigne el número 3 a un nodo o el que asigna");
+    mvwprintw(manual_win, 16, 1, "el número del último nodo disponible.");
+
+    mvwprintw(manual_win, 18, 1, "Pulsa cualquier tecla para volver a la partida...");
+    wrefresh(manual_win);
     getch();
-    endwin();
+
+    // Eliminar la ventana de instrucciones y volver a la pantalla de juego
+    delwin(manual_win);
+    clear();
+    refresh();
 }
 
 // Inicio extravagante y apoteósico
@@ -188,7 +198,6 @@ int main() {
 
     int posUsuario = 0; // Inicializamos la posición del usuario al principio del path
     clear();            // Limpiamos la pantalla antes de mostrar el path
-    //mostrarPath(path, longitud, posUsuario);
 
     int term_size_y = getmaxy(stdscr); // para centrar la pantalla
     int to_down = (term_size_y - 8) / 2;
@@ -254,14 +263,13 @@ int main() {
                             comprobacion = 0; // condición de fin del juego
                         }
                     }
-                    turno++; // cada vez que se pulsa enter se introduce un número en el nodo y se pasa el turno
+                    turno++;        // cada vez que se pulsa enter se introduce un número en el nodo y se pasa el turno
                     comprobacion--; // al llegar a 0 se acaba la partida
                 }
                 break;
         }
     }
 
-    // Va mal esto. Si pulsas q ganas inmediatamente. No sé si era esa tu intención, en cuyo caso, buen trabajo
     mostrarPath(path, longitud, posUsuario);
     mvprintw(3 + to_down, 0 + to_right, "¡Gana el jugador: %d!", turno % 2);
     getch(); // Esperar a que el usuario presione una tecla para ver la pantalla de victoria
