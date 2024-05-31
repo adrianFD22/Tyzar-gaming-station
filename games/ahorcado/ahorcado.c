@@ -150,11 +150,11 @@ int main() {
     while (intentos < MAX_INTENTOS && strcmp(palabraSecreta, palabraAdivinada) != 0) { //quedan intentos Y no has acertado la palabra
         int term_size_x = getmaxx(stdscr);
         int to_right = (term_size_x - (10+strlen(palabraSecreta)))/2;
-        printw(" Intenta adivinar la palabra secreta. Son sólo minúsculas y no hay acentos.\n\n");
+        printw(" Intenta adivinar la palabra secreta. Son solo minusculas y no hay acentos.\n\n");
         mvprintw(3, 0+to_right, " Palabra: %s\n", palabraAdivinada);
         printw("\n Introduce una letra: ");
         printw("\n\n Puedes presionar 'q' para salir del juego.");
-        printw("\n Letras Usadas: %s ", letrasUsadas);
+        printw("\n Letras usadas: %s ", letrasUsadas);
         dibujarMuneco(intentos);
         refresh();
 
@@ -184,7 +184,7 @@ int main() {
         if (comprobarLetra(palabraSecreta, letra, palabraAdivinada) == 0) {
             clear();
             intentos++;
-            printw(" La letra '%c' no está en la palabra.", letra);
+            printw(" La letra '%c' no esta en la palabra.", letra);
             printw(" Te quedan %d intentos.\n", MAX_INTENTOS - intentos);
             refresh();
         } else {
