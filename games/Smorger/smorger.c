@@ -12,12 +12,16 @@
 // pudiendo especificar una profundidad máxima para que enemigos lejanos no
 // vayan a por el jugador.
 
-
-#include <ncurses.h>
-#include <stdlib.h>
-
 #define WIDTH 40    // Dimensiones de cada sala (en principio todas las salas tienen el mismo tamaño)
 #define HEIGHT 20   // Intentar que sean pares para no marearnos al dividir cuando haya que centrar la pantalla
+
+#define UP      0
+#define LEFT    1
+#define DOWN    2
+#define RIGHT   3
+
+#include <ncurses.h>
+#include "room.h"
 
 #define STATS_WIDTH 30
 #define STATS_HEIGHT 10
@@ -33,10 +37,6 @@
 #define PLAYER_DOWN  "|v"
 #define PLAYER_LEFT  "<-"
 #define PLAYER_RIGHT "->"
-#define UP      0
-#define LEFT    1
-#define DOWN    2
-#define RIGHT   3
 
 struct smorger {
     int position[2];    // Coordenadas del jugador
@@ -48,7 +48,6 @@ struct smorger {
 };
 typedef struct smorger smorger;
 
-int** generate_room();
 void print_room(WINDOW* win, int** room, smorger player);
 void print_stats(WINDOW* win, smorger player);
 void handle_input(smorger* player, int input, int** room);
@@ -110,28 +109,6 @@ int main() {
 }
 
 
-// Genera las paredes de una sala
-int** generate_room() {
-    int **room;
-
-    // Inicializar la sala sin paredes
-    room = (int**) malloc(HEIGHT * sizeof(int*));
-    for (int row = 0; row < HEIGHT; row++) {
-        room[row] = (int*) calloc(WIDTH, sizeof(int));
-    }
-
-    // Añadir las paredes
-    for (int row = 0; row < HEIGHT; row++) {
-        room[row][0] = 1;
-        room[row][WIDTH - 1] = 1;
-    }
-    for (int col = 0; col < WIDTH; col++) {
-        room[0][col] = 1;
-        room[HEIGHT - 1][col] = 1;
-    }
-
-    return room;
-}
 
 
 // ADRIAN: esta parte igual se puede mejorar un poco. En cada case, comprobar si hay o no pared con el operador ternario. o igual está mejor así, no sé
