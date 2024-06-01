@@ -55,13 +55,8 @@
 #define WINKIES_LENGTH 100
 
 // Estilo. Caracteres que representan cada entidad de la sala
-<<<<<<< HEAD
-#define WALL "##"   // Igual podemos poner caracteres sólidos
-#define DOOR "  "
-=======
 //#define WALL ACS_BLOCK
 //#define DOOR "  "
->>>>>>> 85a409d5aced580fbb2dd2e9d04671fc44dc2e3e
 
 // Distintas orientaciones del smorger-hero, sujeto a ideas
 #define PLAYER_UP    "^|"
@@ -77,12 +72,8 @@ struct smorger {
     int position[2];    // Coordenadas del jugador
     int orientation;    // Hacia donde mira (UP, LEFT, DOWN, RIGHT)
     int color;          // Color del personaje
-<<<<<<< HEAD
-    char** winkies;     // Lista de powerups llamados winkies
-=======
     // Lista de powerups (winkies)
     wchar_t winkies[WINKIES_LENGTH];     // Lista de powerups llamados winkies
->>>>>>> 85a409d5aced580fbb2dd2e9d04671fc44dc2e3e
     int winkies_count;  // Número de winkies que tiene el jugador
 };
 typedef struct smorger smorger;
