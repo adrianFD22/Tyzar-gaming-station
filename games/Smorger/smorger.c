@@ -12,36 +12,6 @@
 // pudiendo especificar una profundidad máxima para que enemigos lejanos no
 // vayan a por el jugador.
 
-// Chorradas: el juego tiene que tener muuuchos nombres extraños para que al
-// jugarlo digamos cosas como "mi smorger franchula 4 merters pero solo extrae 2"
-
-// Notas:
-//  - Por favor (no me pidas que deje de ser hombre), primero el main y luego las funciones
-//  - Hay que separar las cosas lógicas (mover personaje, colisión de proyectil, color de
-//      las cosas...) de las cosas de visualizar (mostrar pantalla, print).
-//  - Quizás este es un buen proyecto para usar distintas windows (ncurses), para no
-//      estar todo el rato refrescando la pantalla
-//  - Idea: podemos hacer un nivel que para pasártelo haya que hacer la pantalla
-//      pequeña o algo así. Aunque, una vez resuelto ya no tiene gracia. Lo suyo
-//      es que este juego sea procedural, no se acabe.
-//  - Tengo la duda de si hacer que los enemigos y el jugador tengan el mismo tipo,
-//      "objetos" del mismo struct. Creo que no es buena idea porque el jugador
-//      podría tener cosas como "munición" que los enemigos no.
-
-//NOTAS DIEGO:
-// - Powerups llamados winkies que hagan cosas, tal vez acumulables como en el isaac.
-// - He puesto un marquito para saber las dimensiones de la sala, que tendrá que ser un tamaño fijo.
-//      Actualización: igual quito el marquito porque me está molestando con las puertas, descubrirás de qué
-//      hablo en las notas de abajo, te me cuidas makina un salu2.
-// - El movimiento del personaje va en una ventana distinta de ncurses para no tener que referscar todo.
-//      - ADRIAN: Buena idea!
-// - Implementadas las orientciones del movimiento del smorger.
-// - No sé por que no se ven las puertas de las salas y no se puede cruzar jeje, en realidad al cruzar
-//      la puerta (cuando se arregle el bug) solo apareces por la puerta contraria, hay que mejorarlo para
-//      que se tenga en cuenta que cada sala es diferente con bjetos y eso.
-// - He quitado el marquito ese de mierda y en su lugar hay '##'
-// - Quiero aprovechar el espacio fuera de la sala en la terminal para poner cosas como info del smorger-hero
-//       o los winkies (me ha encantado escribir esta frase)
 
 #include <ncurses.h>
 #include <stdlib.h>
@@ -164,10 +134,8 @@ int** generate_room() {
 }
 
 
-// ADRIAN: por qué el smorger es un puntero?
-// ADRIAN: creo que esto no tendría que manejar a los enemigos
 // ADRIAN: esta parte igual se puede mejorar un poco. En cada case, comprobar si hay o no pared con el operador ternario. o igual está mejor así, no sé
-// Maneja la entrada del usuario y mueve al smorger-hero (y a futuro los enemigos)
+// Maneja la entrada del usuario y mueve al smorger-hero
 void handle_input(smorger* player, int input, int** room) {
     int new_x = player->position[0];
     int new_y = player->position[1];
@@ -286,7 +254,7 @@ void print_stats(WINDOW* win, smorger player) {
     wrefresh(win);
 }
 
-// ADRIAN: esto lo podemos meter dentro de print_room
+// ADRIAN: esto lo podemos meter dentro de print_room: sí
 // Imprime el jugador con la orientación adecuada
 void print_player(WINDOW* win, smorger player, int corner_y, int corner_x) {
     switch(player.orientation) {
