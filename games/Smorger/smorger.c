@@ -21,12 +21,15 @@
 #define RIGHT   3
 
 #include <ncurses.h>
+#include <stdlib.h>
 #include "room.h"
 
 #define STATS_WIDTH 30
 #define STATS_HEIGHT 10
 
 #define WINKIES_LENGTH 100
+#define MAX_PROJECTILES 100 //arbitrario
+                            //posible mecánica para recargar los proyectiles y poder volver a disparar
 
 // Estilo. Caracteres que representan cada entidad de la sala
 //#define WALL ACS_BLOCK
@@ -38,6 +41,8 @@
 #define PLAYER_LEFT  "<-"
 #define PLAYER_RIGHT "->"
 
+#define PROJECTILE_CHAR "oo" //diseño sujeto a cambios
+
 struct smorger {
     int position[2];    // Coordenadas del jugador
     int orientation;    // Hacia donde mira (UP, LEFT, DOWN, RIGHT)
@@ -48,15 +53,27 @@ struct smorger {
 };
 typedef struct smorger smorger;
 
-void print_room(WINDOW* win, int** room, smorger player);
+struct projectile {
+    int position[2];    // Coordenadas del proyectil
+    int direction;      // Dirección del proyectil (UP, LEFT, DOWN, RIGHT)
+    int active;         // Estado del proyectil (activo o no)
+    int color;          // Todavía no implementado
+    //incluiremos cosas que lo harán más smórgico
+};
+typedef struct projectile projectile;
+
+void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[], int num_projectiles);
 void print_stats(WINDOW* win, smorger player);
-void handle_input(smorger* player, int input, int** room);
+void handle_input(smorger* player, int input, int** room, projectile projectiles[], int* num_projectiles);
 void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
 void change_room(smorger* player, int direction);
+void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
 
 int main() {
     int **room;
     smorger player;
+    projectile projectiles[MAX_PROJECTILES];
+    int num_projectiles = 0;
 
     // Inicializar la lista de winkies, se irán recogiendo por el mapa
     player.winkies_count = 0;
@@ -87,20 +104,21 @@ int main() {
 
     int ch;
     while ((ch = wgetch(win_room)) != 'q') { // Presiona 'q' para salir
-    handle_input(&player, ch, room);
+        handle_input(&player, ch, room, projectiles, &num_projectiles);
+        update_projectiles(projectiles, &num_projectiles, room);
 
-    // Detectar si el smorger-hero cruza una puerta y cambiar de sala
-    if (player.position[1] == 0 && player.position[0] == WIDTH / 2) {
-        change_room(&player, UP);
-    } else if (player.position[1] == HEIGHT - 1 && player.position[0] == WIDTH / 2) {
-        change_room(&player, DOWN);
-    } else if (player.position[0] == 0 && player.position[1] == HEIGHT / 2) {
-        change_room(&player, LEFT);
-    } else if (player.position[0] == WIDTH - 1 && player.position[1] == HEIGHT / 2) {
-        change_room(&player, RIGHT);
-    }
-    print_room(win_room, room, player);
-    print_stats(win_stats, player);
+        // Detectar si el smorger-hero cruza una puerta y cambiar de sala
+        if (player.position[1] == 0 && player.position[0] == WIDTH / 2) {
+            change_room(&player, UP);
+        } else if (player.position[1] == HEIGHT - 1 && player.position[0] == WIDTH / 2) {
+            change_room(&player, DOWN);
+        } else if (player.position[0] == 0 && player.position[1] == HEIGHT / 2) {
+            change_room(&player, LEFT);
+        } else if (player.position[0] == WIDTH - 1 && player.position[1] == HEIGHT / 2) {
+            change_room(&player, RIGHT);
+        }
+        print_room(win_room, room, player, projectiles, num_projectiles);
+        print_stats(win_stats, player);
     }
 
     endwin();
@@ -108,12 +126,9 @@ int main() {
     return 0;
 }
 
-
-
-
 // ADRIAN: esta parte igual se puede mejorar un poco. En cada case, comprobar si hay o no pared con el operador ternario. o igual está mejor así, no sé
-// Maneja la entrada del usuario y mueve al smorger-hero
-void handle_input(smorger* player, int input, int** room) {
+// Maneja la entrada del usuario y mueve al player, además de los proyectiles.
+void handle_input(smorger* player, int input, int** room, projectile projectiles[], int* num_projectiles) {
     int new_x = player->position[0];
     int new_y = player->position[1];
 
@@ -136,6 +151,16 @@ void handle_input(smorger* player, int input, int** room) {
         case KEY_LEFT:
             new_x--;
             player->orientation = LEFT;
+            break;
+
+        case 10: // Enter: Disparo
+            if (*num_projectiles < MAX_PROJECTILES) {
+                projectiles[*num_projectiles].position[0] = player->position[0];
+                projectiles[*num_projectiles].position[1] = player->position[1];
+                projectiles[*num_projectiles].direction = player->orientation;
+                projectiles[*num_projectiles].active = 1;
+                (*num_projectiles)++;
+            }
             break;
     }
 
@@ -181,7 +206,7 @@ void change_room(smorger* player, int direction) {
 
 // Muestra la sala. Cada coordenada se muestra como dos caracteres. Esta función también
 // se encargará de mostrar los demás objetos (jugador, enemigos, proyectiles...)
-void print_room(WINDOW* win, int** room, smorger player) {
+void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[], int num_projectiles) {
     // Limpiar la ventana antes de redibujar
     werase(win);
 
@@ -214,7 +239,29 @@ void print_room(WINDOW* win, int** room, smorger player) {
     // -----------
     //    Player
     // -----------
-    print_player(win, player, 0, 0);
+    switch(player.orientation) { //Imprime al player con la orientación adecuada
+        case UP:
+            mvwprintw(win, player.position[1], 2 * player.position[0], PLAYER_UP);
+            break;
+        case DOWN:
+            mvwprintw(win, player.position[1], 2 * player.position[0], PLAYER_DOWN);
+            break;
+        case LEFT:
+            mvwprintw(win, player.position[1], 2 * player.position[0], PLAYER_LEFT);
+            break;
+        case RIGHT:
+            mvwprintw(win, player.position[1], 2 * player.position[0], PLAYER_RIGHT);
+            break;
+    }
+
+    // -----------
+    //    Proyectiles
+    // -----------
+    for (int i = 0; i < num_projectiles; i++) {
+        if (projectiles[i].active) {
+            mvwprintw(win, projectiles[i].position[1], 2 * projectiles[i].position[0], PROJECTILE_CHAR);
+        }
+    }
 
     wrefresh(win); // Actualiza la ventana con los nuevos cambios
 }
@@ -231,21 +278,31 @@ void print_stats(WINDOW* win, smorger player) {
     wrefresh(win);
 }
 
-// ADRIAN: esto lo podemos meter dentro de print_room: sí
-// Imprime el jugador con la orientación adecuada
-void print_player(WINDOW* win, smorger player, int corner_y, int corner_x) {
-    switch(player.orientation) {
-        case UP:
-            mvwprintw(win, corner_y + player.position[1], corner_x + 2 * player.position[0], PLAYER_UP);
-            break;
-        case DOWN:
-            mvwprintw(win, corner_y + player.position[1], corner_x + 2 * player.position[0], PLAYER_DOWN);
-            break;
-        case LEFT:
-            mvwprintw(win, corner_y + player.position[1], corner_x + 2 * player.position[0], PLAYER_LEFT);
-            break;
-        case RIGHT:
-            mvwprintw(win, corner_y + player.position[1], corner_x + 2 * player.position[0], PLAYER_RIGHT);
-            break;
+// Actualiza la posición de los proyectiles
+void update_projectiles(projectile projectiles[], int* num_projectiles, int** room) {
+    for (int i = 0; i < *num_projectiles; i++) {
+        if (projectiles[i].active) {
+            switch (projectiles[i].direction) {
+                case UP:
+                    projectiles[i].position[1]--;
+                    break;
+                case DOWN:
+                    projectiles[i].position[1]++;
+                    break;
+                case LEFT:
+                    projectiles[i].position[0]--;
+                    break;
+                case RIGHT:
+                    projectiles[i].position[0]++;
+                    break;
+            }
+
+            // Verificar si el proyectil ha colisionado con una pared
+            if (projectiles[i].position[0] < 0 || projectiles[i].position[0] >= WIDTH ||
+                projectiles[i].position[1] < 0 || projectiles[i].position[1] >= HEIGHT ||
+                room[projectiles[i].position[1]][projectiles[i].position[0]] == 1) {
+                projectiles[i].active = 0;
+            }
+        }
     }
 }
