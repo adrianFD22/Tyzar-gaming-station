@@ -12,6 +12,7 @@
 // pudiendo especificar una profundidad máxima para que enemigos lejanos no
 // vayan a por el jugador.
 
+
 #define WIDTH 40    // Dimensiones de cada sala (en principio todas las salas tienen el mismo tamaño)
 #define HEIGHT 20   // Intentar que sean pares para no marearnos al dividir cuando haya que centrar la pantalla
 
@@ -45,18 +46,18 @@
 #define PROJECTILE_CHAR "oo" //diseño sujeto a cambios
 
 struct smorger {
-    int position[2];    // Coordenadas del jugador
-    int orientation;    // Hacia donde mira (UP, LEFT, DOWN, RIGHT)
-    int color;          // Color del personaje
-    // Lista de powerups (winkies)
-    wchar_t winkies[WINKIES_LENGTH];     // Lista de powerups llamados winkies
-    int winkies_count;  // Número de winkies que tiene el jugador
+    int position[2];                    // Coordenadas del jugador
+    int orientation;                    // Hacia donde mira (UP, LEFT, DOWN, RIGHT)
+    int color;                          // Color del personaje
+    int ammo;                           // Número de disparos en el cargador
+    wchar_t winkies[WINKIES_LENGTH];    // Lista de powerups llamados winkies
+    int winkies_count;                  // Número de winkies que tiene el jugador
 };
 typedef struct smorger smorger;
 
 struct projectile {
     int position[2];    // Coordenadas del proyectil
-    int direction;      // Dirección del proyectil (UP, LEFT, DOWN, RIGHT)
+    int orientation;    // Dirección del proyectil (UP, LEFT, DOWN, RIGHT)
     int active;         // Estado del proyectil (activo o no)
     int color;          // Todavía no implementado
     //incluiremos cosas que lo harán más smórgico
@@ -67,7 +68,7 @@ void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[
 void print_stats(WINDOW* win, smorger player);
 void handle_input(smorger* player, int input, int** room, projectile projectiles[], int* num_projectiles);
 void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
-void change_room(smorger* player, int direction);
+void change_room(smorger* player, int orientation);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
 void CheckSize();
 
@@ -77,8 +78,9 @@ int main() {
     projectile projectiles[MAX_PROJECTILES];
     int num_projectiles = 0;
 
-    // Inicializar la lista de winkies, se irán recogiendo por el mapa
-    player.winkies_count = 0;
+    // Inicializar smorger. Podría ser una función si lo necesitamos en un futuro
+    player.ammo = 20;
+    player.winkies_count = 0;   // En realidad esto es innecesario porque el valor por defecto ya es 0
 
     initscr();
     curs_set(0);
@@ -157,13 +159,14 @@ void handle_input(smorger* player, int input, int** room, projectile projectiles
             player->orientation = LEFT;
             break;
 
-        case 10: // Enter: Disparo
-            if (*num_projectiles < MAX_PROJECTILES) {
+        case ' ': // Disparo
+            if ((*player).ammo > 0) {
                 projectiles[*num_projectiles].position[0] = player->position[0];
                 projectiles[*num_projectiles].position[1] = player->position[1];
-                projectiles[*num_projectiles].direction = player->orientation;
+                projectiles[*num_projectiles].orientation = player->orientation;
                 projectiles[*num_projectiles].active = 1;
                 (*num_projectiles)++;
+                (*player).ammo--;
             }
             break;
     }
@@ -183,8 +186,8 @@ void handle_input(smorger* player, int input, int** room, projectile projectiles
 // Cambia de sala cuando el smorger-hero cruza una puerta, en realidad solo te pone en
 // la puerta contraria, ya se cambiará
 // ADRIAN: por qué esto es un puntero?
-void change_room(smorger* player, int direction) {
-    switch(direction) {
+void change_room(smorger* player, int orientation) {
+    switch(orientation) {
         case UP:
             // El jugador cruza la puerta superior y aparece en la puerta inferior
             player->position[1] = HEIGHT - 2; // Altura menos 2 para evitar sobreescribir la pared inferior
@@ -271,6 +274,8 @@ void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[
 }
 
 void print_stats(WINDOW* win, smorger player) {
+    werase(win);
+
     // Mostrar winkies.
     mvwprintw(win, 1, 2, "Winkies: ");
     for (int i = 0; i < player.winkies_count; i++) {
@@ -279,14 +284,17 @@ void print_stats(WINDOW* win, smorger player) {
         //wprintw(win, "%c ", player.winkies[i]);
     }
 
+    // Mostrar munición
+    mvwprintw(win, 3, 2, "Ketchungs: %d", player.ammo);
+
     wrefresh(win);
 }
 
-// Actualiza la posición de los proyectiles
+// Actualiza la posición de los proyectiles y devuelve el número de proyectiles en pantalla
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room) {
     for (int i = 0; i < *num_projectiles; i++) {
         if (projectiles[i].active) {
-            switch (projectiles[i].direction) {
+            switch (projectiles[i].orientation) {
                 case UP:
                     projectiles[i].position[1]--;
                     break;
@@ -302,10 +310,9 @@ void update_projectiles(projectile projectiles[], int* num_projectiles, int** ro
             }
 
             // Verificar si el proyectil ha colisionado con una pared
-            if (projectiles[i].position[0] < 0 || projectiles[i].position[0] >= WIDTH ||
-                projectiles[i].position[1] < 0 || projectiles[i].position[1] >= HEIGHT ||
-                room[projectiles[i].position[1]][projectiles[i].position[0]] == 1) {
+            if (room[projectiles[i].position[1]][projectiles[i].position[0]] != 0) {
                 projectiles[i].active = 0;
+                (*num_projectiles)--;
             }
         }
     }
@@ -317,7 +324,7 @@ void update_projectiles(projectile projectiles[], int* num_projectiles, int** ro
 // NOTAS: sé que se puede mejorar pero lo dejo así como versión preliminar.
 void CheckSize() {
     char horizontal[131];
-    memset(horizontal, '-', 130); 
+    memset(horizontal, '-', 130);
     horizontal[130] = '\0'; // Carácter nulo al final
 
     char vertical[129];
@@ -328,7 +335,7 @@ void CheckSize() {
     for (int i = 1; i < 30; i++) {
         mvprintw(i, 0, "|");
         mvprintw(i, 1, "%s", vertical);
-        mvprintw(i, 129, "|"); 
+        mvprintw(i, 129, "|");
     }
     mvprintw(30, 0, "%s", horizontal);
 
