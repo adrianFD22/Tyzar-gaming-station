@@ -91,8 +91,6 @@ int main() {
     // Crear ventanas
     WINDOW* win_room = newwin(HEIGHT, WIDTH * 2, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 - 3 - WIDTH);       // Sala
     WINDOW* win_stats = newwin(STATS_HEIGHT, STATS_WIDTH, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 + WIDTH + 3);      // Estadísticas
-    box(win_stats, 0, 0);
-    wrefresh(win_room);
 
     keypad(win_room, TRUE); // Permite el uso de las teclas de flecha. Hay que activarlo en la ventana
 
@@ -109,6 +107,9 @@ int main() {
     player.winkies_count = 4;
 
     int ch;
+    print_room(win_room, room, player, projectiles, num_projectiles);
+    print_stats(win_stats, player);
+
     while ((ch = wgetch(win_room)) != 'q') { // Presiona 'q' para salir
         handle_input(&player, ch, room, projectiles, &num_projectiles);
         update_projectiles(projectiles, &num_projectiles, room);
@@ -275,6 +276,7 @@ void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[
 
 void print_stats(WINDOW* win, smorger player) {
     werase(win);
+    box(win, 0, 0);
 
     // Mostrar winkies.
     mvwprintw(win, 1, 2, "Winkies: ");
