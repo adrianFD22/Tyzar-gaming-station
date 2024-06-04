@@ -343,7 +343,6 @@ void check_size() {
 
         mvprintw(LINES/2 - 1, (COLS - 77)/2, "Antes de continuar, comprueba que el marco cabe completamente en la terminal.");
         mvprintw(LINES/2 + 0, (COLS - 40)/2, "Redimensiona la terminal si lo necesitas.");
-        mvprintw(LINES/2 + 1, (COLS - 35)/2, "Pulsa ENTER para volver a comprobar");
 
         getch();
 
