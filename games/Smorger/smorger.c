@@ -22,6 +22,7 @@
 
 #include <ncurses.h>
 #include <stdlib.h>
+#include <string.h>  // para memset()
 #include "room.h"
 
 #define STATS_WIDTH 30
@@ -68,6 +69,7 @@ void handle_input(smorger* player, int input, int** room, projectile projectiles
 void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
 void change_room(smorger* player, int direction);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
+void CheckSize();
 
 int main() {
     int **room;
@@ -81,6 +83,8 @@ int main() {
     initscr();
     curs_set(0);
     noecho();             // No muestra los caracteres mientras se escriben
+
+    CheckSize();
 
     // Crear ventanas
     WINDOW* win_room = newwin(HEIGHT, WIDTH * 2, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 - 3 - WIDTH);       // Sala
@@ -305,4 +309,37 @@ void update_projectiles(projectile projectiles[], int* num_projectiles, int** ro
             }
         }
     }
+}
+
+// Función para asegurar que el juego se puede iniciar según el tamaño de la terminal
+// Se crea un marco con el tamaño mínimo de la terminal para jugar, el jugador puede comprobarlo
+// antes de continuar con el juego para que no le crashee.
+// NOTAS: sé que se puede mejorar pero lo dejo así como versión preliminar.
+void CheckSize() {
+    char horizontal[131];
+    memset(horizontal, '-', 130); 
+    horizontal[130] = '\0'; // Carácter nulo al final
+
+    char vertical[129];
+    memset(vertical, ' ', 128);
+    vertical[128] = '\0'; // Carácter nulo al final
+
+    mvprintw(0, 0, "%s", horizontal);
+    for (int i = 1; i < 30; i++) {
+        mvprintw(i, 0, "|");
+        mvprintw(i, 1, "%s", vertical);
+        mvprintw(i, 129, "|"); 
+    }
+    mvprintw(30, 0, "%s", horizontal);
+
+    mvprintw(LINES/2, (COLS - 77)/2, "Antes de continuar, comprueba que el marco cabe completamente en la terminal.");
+    mvprintw(LINES/2 + 1, (COLS - 51)/2, "Pulsa q y redimensiona la terminal si lo necesitas.");
+
+    char check = getch();
+    if (check == 'q') {
+        exit(0);
+    }
+
+    clear();
+    refresh();
 }
