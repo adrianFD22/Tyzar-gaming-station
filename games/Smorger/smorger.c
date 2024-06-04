@@ -70,7 +70,7 @@ void handle_input(smorger* player, int input, int** room, projectile projectiles
 void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
 void change_room(smorger* player, int orientation);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
-void CheckSize();
+void check_size();
 
 int main() {
     int **room;
@@ -86,7 +86,7 @@ int main() {
     curs_set(0);
     noecho();             // No muestra los caracteres mientras se escriben
 
-    CheckSize();
+    check_size();
 
     // Crear ventanas
     WINDOW* win_room = newwin(HEIGHT, WIDTH * 2, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 - 3 - WIDTH);       // Sala
@@ -322,7 +322,7 @@ void update_projectiles(projectile projectiles[], int* num_projectiles, int** ro
 // Se crea un marco con el tamaño mínimo de la terminal para jugar, el jugador puede comprobarlo
 // antes de continuar con el juego para que no le crashee.
 // NOTAS: sé que se puede mejorar pero lo dejo así como versión preliminar.
-void CheckSize() {
+void check_size() {
     char horizontal[131];
     memset(horizontal, '-', 130);
     horizontal[130] = '\0'; // Carácter nulo al final
