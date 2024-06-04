@@ -80,11 +80,11 @@ int main() {
 
     // Inicializar smorger. Podría ser una función si lo necesitamos en un futuro
     player.ammo = 20;
-    player.winkies_count = 0;   // En realidad esto es innecesario porque el valor por defecto ya es 0
+    player.winkies_count = 0;  // En realidad esto es innecesario porque el valor por defecto ya es 0
 
     initscr();
-    curs_set(0);
-    noecho();             // No muestra los caracteres mientras se escriben
+    curs_set(0);               // Cursor invisible
+    noecho();                  // No muestra los caracteres mientras se escriben
 
     check_size();
 
@@ -96,8 +96,9 @@ int main() {
 
     // Provisional para probar el imprimir pantalla
     room = generate_room();
-    player.position[0] = WIDTH / 2;
-    player.position[1] = HEIGHT / 2;
+    player.position[0] = 1;             // Inicializado junto a la puerta
+    player.position[1] = HEIGHT / 2;    // de la izquierda y
+    player.orientation = RIGHT;         // mirando hacia la derecha
 
     // Provisional. Añadir winkies
     player.winkies[0] = ACS_PI;
