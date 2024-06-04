@@ -321,7 +321,6 @@ void update_projectiles(projectile projectiles[], int* num_projectiles, int** ro
 // Función para asegurar que el juego se puede iniciar según el tamaño de la terminal
 // Se crea un marco con el tamaño mínimo de la terminal para jugar, el jugador puede comprobarlo
 // antes de continuar con el juego para que no le crashee.
-// NOTAS: sé que se puede mejorar pero lo dejo así como versión preliminar.
 void check_size() {
     char horizontal[131];
     memset(horizontal, '-', 130);
@@ -331,20 +330,24 @@ void check_size() {
     memset(vertical, ' ', 128);
     vertical[128] = '\0'; // Carácter nulo al final
 
-    mvprintw(0, 0, "%s", horizontal);
-    for (int i = 1; i < 30; i++) {
-        mvprintw(i, 0, "|");
-        mvprintw(i, 1, "%s", vertical);
-        mvprintw(i, 129, "|");
-    }
-    mvprintw(30, 0, "%s", horizontal);
+    while (LINES < 30 || COLS < 130) {
+        mvprintw(0, 0, "%s", horizontal);
+        for (int i = 1; i < 30; i++) {
+            mvprintw(i, 0, "|");
+            mvprintw(i, 1, "%s", vertical);
+            mvprintw(i, 129, "|");
+        }
+        mvprintw(30, 0, "%s", horizontal);
 
-    mvprintw(LINES/2, (COLS - 77)/2, "Antes de continuar, comprueba que el marco cabe completamente en la terminal.");
-    mvprintw(LINES/2 + 1, (COLS - 51)/2, "Pulsa q y redimensiona la terminal si lo necesitas.");
+        mvprintw(LINES/2 - 1, (COLS - 77)/2, "Antes de continuar, comprueba que el marco cabe completamente en la terminal.");
+        mvprintw(LINES/2 + 0, (COLS - 40)/2, "Redimensiona la terminal si lo necesitas.");
+        mvprintw(LINES/2 + 1, (COLS - 35)/2, "Pulsa ENTER para volver a comprobar");
 
-    char check = getch();
-    if (check == 'q') {
-        exit(0);
+        getch();
+
+        mvprintw(LINES/2 - 1, (COLS - 77)/2, "                                                                             ");
+        mvprintw(LINES/2 + 0, (COLS - 40)/2, "                                         ");
+        mvprintw(LINES/2 + 1, (COLS - 35)/2, "                                         ");
     }
 
     clear();
