@@ -2,7 +2,7 @@
 #include <time.h>
 
 #define size_of_array(x) sizeof(x)/sizeof((x)[0])
-#define MAX_WALLS 10
+#define MAX_WALLS 22
 
 int** generate_room();
 
@@ -15,7 +15,17 @@ struct room {
     int walls[MAX_WALLS][4];
 };
 
+// NOTA: Se puede hacer mirror de las salas que lo permitan
+// para tener más variedad.
 const struct room poole_rooms[ ] = {
+    // Room 0 (empty room)
+    {
+        .n_walls = 0,
+        .walls = {
+            
+        }
+    },
+
     // Room 1 (vertical wall, split in 2)
     {
         .n_walls = 2,
@@ -40,27 +50,82 @@ const struct room poole_rooms[ ] = {
     {
         .n_walls = 2,
         .walls = {
-            {6, HEIGHT/3, RIGHT, 28},  
-            {6, 2*HEIGHT/3, RIGHT, 28}  
+            {6, HEIGHT/3, RIGHT, 28},   // pared superior
+            {6, 2*HEIGHT/3, RIGHT, 28}  // pared inferior
         }
     },
 
-    // Room 4 (separated doors, groups of 2)
-    // Descenso a la locura
+    // Room 4 (split in 3)
+    {
+        .n_walls = 3,
+        .walls = {
+            // Paredes verticales
+            {2*WIDTH/3, 1, DOWN, 8},   {2*WIDTH/3, 12, DOWN, 7},
+
+            // Pared horizontal
+            {6, HEIGHT/2, RIGHT, 21}
+            
+        }
+    },
+
+    //------------------------------
+    // ROOMS para niveles más altos
+    //------------------------------
+
+    // Room 5 (separated doors, groups of 2)
     {
         .n_walls = 6, 
         .walls = {
             // Pared superior
             {WIDTH/2 - 3, 1, DOWN, 4},  
-            {WIDTH/2 - 3, HEIGHT/2 - 5, RIGHT, 19},
-            {WIDTH - 5, 6, DOWN, 9},
+            {WIDTH/2 - 3, HEIGHT/2 - 5, RIGHT, 18},
+            {WIDTH - 6, 6, DOWN, 9},
 
             // Pared inferior
             {WIDTH/2 + 3, 15, DOWN, 4}, 
             {5, 14, RIGHT, 19},
             {5, 6, DOWN, 9},
         }
-    }
+    },
+
+    // Room 6 (corridors, little escape)
+    {
+        .n_walls = 22, 
+        .walls = {
+            //Bloque superior izquierdo      //Bloque superior derecho  
+            {1, 1, RIGHT, 15},                {25, 1, RIGHT, 14},
+            {1, 2, RIGHT, 15},                {25, 2, RIGHT, 14},
+            {1, 3, RIGHT, 15},                {25, 3, RIGHT, 14},
+            {1, 4, RIGHT, 15},                {25, 4, RIGHT, 14}, 
+            {1, 5, RIGHT, 15},                {25, 5, RIGHT, 14}, 
+            {1, 6, RIGHT, 15},                {25, 6, RIGHT, 14},
+
+            //Bloque inferior izquierdo       //Bloque inferior derecho
+            {1, 14, RIGHT, 15},               {25, 14, RIGHT, 14},
+            {1, 15, RIGHT, 15},               {25, 15, RIGHT, 14},
+            {1, 16, RIGHT, 15},               {25, 16, RIGHT, 14},
+            {1, 17, RIGHT, 15},               {25, 17, RIGHT, 14},
+            {1, 18, RIGHT, 15},               {25, 18, RIGHT, 14}
+        }
+    },
+
+    // Room 7 (narrow path)  
+    //  NOTA: Se pueden hacer 4 variaciones con las 4 direcciones, así
+    //  hay más variedad de rooms.
+    {
+        .n_walls = 9, 
+        .walls = {  
+            // Paredes verticales
+            {15, 1, DOWN, 5},
+            {15, 14, DOWN, 5},
+
+            // Paredes horizontales
+            {15, 6, RIGHT, 14},   {15, 11, RIGHT, 14},
+            {15, 7, RIGHT, 14},   {15, 12, RIGHT, 14},
+            {15, 8, RIGHT, 14},   {15, 13, RIGHT, 14},
+            {15, 9, RIGHT, 14}
+        }
+    }       
 };
 const int n_rooms = size_of_array(poole_rooms);
 
@@ -88,7 +153,7 @@ int** generate_room() {
     // Añadir las paredes interiores
     srand(time(NULL));
     random_room = rand() % n_rooms;    // Elegir una room aleatoria del poole. No es perfectamente aleatorio porque esto genera un número entre 0 y MAX_RAND
-    //random_room = 3; // testeo de rooms
+    //random_room = 0; // testeo de rooms
     n_walls = poole_rooms[random_room].n_walls;
     for (int i = 0; i < n_walls; i++) {
         // Extraer características de la pared
