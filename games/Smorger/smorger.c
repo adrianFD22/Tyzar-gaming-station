@@ -24,8 +24,8 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>  // para memset()
-#include "room.h"
 #include "graph.h"   // Aún no implementado
+#include "room.h"
 
 #define STATS_WIDTH 30
 #define STATS_HEIGHT 10
@@ -72,6 +72,7 @@ void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
 void change_room(smorger* player, int orientation);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
 void check_size();
+//void close_door();
 
 int main() {
     int **room;
@@ -90,16 +91,26 @@ int main() {
     check_size();
 
     // Crear ventanas
-    WINDOW* win_room = newwin(HEIGHT, WIDTH * 2, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 - 3 - WIDTH);       // Sala
+    WINDOW* win_room = newwin(HEIGHT, WIDTH * 2, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 - 3 - WIDTH);               // Sala
     WINDOW* win_stats = newwin(STATS_HEIGHT, STATS_WIDTH, (LINES - HEIGHT) / 2, (COLS - STATS_WIDTH) / 2 + WIDTH + 3);      // Estadísticas
 
     keypad(win_room, TRUE); // Permite el uso de las teclas de flecha. Hay que activarlo en la ventana
 
-    // Provisional para probar el imprimir pantalla
-    room = generate_room();
+    /* // no furula
+    Graph* graph = create_random_graph();
+    int current_room = 0;                   // Empezamos en el nodo 0.
+    room = generate_room();   
+    for (int i = 0; i < 4; i++) {
+        if (graph->nodes[current_room].doors[i] == -1) {
+            close_door(i, current_room);
+        }
+    }
+    */
+
+    room = generate_room();  
     player.position[0] = 1;             // Inicializado junto a la puerta
     player.position[1] = HEIGHT / 2;    // de la izquierda y
-    player.orientation = RIGHT;         // mirando hacia la derecha
+    player.orientation = RIGHT;         // mirando hacia la derecha.
 
     // Provisional. Añadir winkies
     player.winkies[0] = ACS_PI;
@@ -359,3 +370,23 @@ void check_size() {
     clear();
     refresh();
 }
+
+/*
+// cerrar las puertas que toca al entrar en sala nueva
+void close_door(int door, int** room) {
+    switch(door) {
+        case UP:
+            
+            break;
+        case DOWN:
+            
+            break;
+        case LEFT:
+            
+            break;
+        case RIGHT:
+            
+            break;
+    }
+}
+*/

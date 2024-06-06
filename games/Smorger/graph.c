@@ -1,3 +1,5 @@
+// Para probar el grafo
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -6,12 +8,10 @@
 #define MAX_EDGES 4
 
 #define NONE -1
-/*                 // Ya está definido en el main
 #define UP 0
 #define DOWN 1
 #define LEFT 2
 #define RIGHT 3
-*/
 
 typedef struct {
     int id;
@@ -99,4 +99,43 @@ Graph* create_random_graph() {
     }
 
     return graph;
+}
+
+void print_graph(Graph* graph) {
+    printf("Grafo:\n");
+    for (int i = 0; i < MAX_NODES; i++) {
+        printf("Sala %d:", graph->nodes[i].id);
+        for (int j = 0; j < MAX_EDGES; j++) {
+            if (graph->nodes[i].doors[j] == NONE) {
+                if (j == UP) {
+                    printf(" Arriba->-1");
+                } else if (j == DOWN) {
+                    printf(" Abajo->-1");
+                } else if (j == LEFT) {
+                    printf(" Izquierda->-1");
+                } else if (j == RIGHT) {
+                    printf(" Derecha->-1");
+                }
+            } else {
+                if (j == UP) {
+                    printf(" Arriba->%d", graph->nodes[i].doors[j]);
+                } else if (j == DOWN) {
+                    printf(" Abajo->%d", graph->nodes[i].doors[j]);
+                } else if (j == LEFT) {
+                    printf(" Izquierda->%d", graph->nodes[i].doors[j]);
+                } else if (j == RIGHT) {
+                    printf(" Derecha->%d", graph->nodes[i].doors[j]);
+                }
+            }
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    Graph* graph = create_random_graph();
+    print_graph(graph);
+
+    free(graph);
+    return 0;
 }
