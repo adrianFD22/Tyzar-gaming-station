@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>  // para memset()
 #include "room.h"
+#include "graph.h"   // Aún no implementado
 
 #define STATS_WIDTH 30
 #define STATS_HEIGHT 10
@@ -240,10 +241,13 @@ void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[
     }
     wattroff(win, A_STANDOUT);
 
-    // Muestra las puertas (mover lo arriba a aquí)
-    // TODO: podemos hacer que la sala sea un struct room que tenga las
-    // paredes en un array (no en una matriz. Esto tiene sus pegas y
-    // sus contras) y un array con las puertas.
+    // Muestra las puertas
+    for (int i = 0; i < MAX_NODES; i++) {
+        if (room[0][WIDTH / 2] == 0) { mvwprintw(win, 0, WIDTH, "  "); } // Puerta superior
+        if (room[HEIGHT - 1][WIDTH / 2] == 0) { mvwprintw(win, HEIGHT - 1, WIDTH, "  "); } // Puerta inferior
+        if (room[HEIGHT / 2][0] == 0) { mvwprintw(win, HEIGHT / 2, 0, "  "); } // Puerta izquierda
+        if (room[HEIGHT / 2][WIDTH - 1] == 0) { mvwprintw(win, HEIGHT / 2, WIDTH - 1, "  "); } // Puerta derecha
+    }
 
     // -----------
     //    Player
