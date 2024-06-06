@@ -13,7 +13,6 @@ int** generate_room();
 struct room {
     int n_walls;
     int walls[MAX_WALLS][4];
-    int doors[MAX_EDGES];
 };
 
 // NOTA: Se puede hacer mirror de las salas que lo permitan

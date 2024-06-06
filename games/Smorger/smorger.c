@@ -72,7 +72,7 @@ void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
 void change_room(smorger* player, int orientation);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
 void check_size();
-//void close_door();
+void close_door();
 
 int main() {
     int **room;
@@ -96,16 +96,19 @@ int main() {
 
     keypad(win_room, TRUE); // Permite el uso de las teclas de flecha. Hay que activarlo en la ventana
 
-    /* // no furula
+    /*
+    // no furula
     Graph* graph = create_random_graph();
-    int current_room = 0;                   // Empezamos en el nodo 0.
+    int current_room = 0;           // Empezamos en el nodo 0 del grafo.
     room = generate_room();   
-    for (int i = 0; i < 4; i++) {
+    int vecinos = graph->nodes[current_room].neighbor_count; // número de puertas abiertas
+    for (int i = 0; i < vecinos; i++) {
         if (graph->nodes[current_room].doors[i] == -1) {
-            close_door(i, current_room);
+            close_door(i, current_room, win_room);
         }
     }
     */
+    
 
     room = generate_room();  
     player.position[0] = 1;             // Inicializado junto a la puerta
@@ -371,22 +374,22 @@ void check_size() {
     refresh();
 }
 
-/*
+
 // cerrar las puertas que toca al entrar en sala nueva
-void close_door(int door, int** room) {
+void close_door(int door, int** room, WINDOW* win) {
+    wattron(win, A_STANDOUT);
     switch(door) {
         case UP:
-            
+            mvwprintw(win, 0, WIDTH, "  ");
             break;
         case DOWN:
-            
+            mvwprintw(win, HEIGHT - 1, WIDTH, "  ");
             break;
         case LEFT:
-            
+            mvwprintw(win, HEIGHT / 2, 0, "  ");
             break;
         case RIGHT:
-            
+            mvwprintw(win, HEIGHT / 2, WIDTH - 1, "  ");
             break;
     }
 }
-*/
