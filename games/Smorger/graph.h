@@ -90,13 +90,26 @@ int determine_direction(int src, int dest) {
 }
 
 // Función para abrir o cerrar puertas según las conexiones
-void configure_doors(Graph* graph, int** rooms) {
+void configure_doors(Graph* graph, int*** rooms) {
     for (int i = 0; i < MAX_NODES; i++) {
         for (int j = 0; j < MAX_NODES; j++) {
             if (graph->nodes[i].neighbors[j] != -1) {
                 int direction = determine_direction(i, graph->nodes[i].neighbors[j]);
                 if (direction != -1) {
-                    rooms[i][direction] = 0; // 0 para puerta abierta
+                    switch (direction) {
+                        case ARRIBA:
+                            rooms[i][0][WIDTH / 2] = 0;
+                            break;
+                        case ABAJO:
+                            rooms[i][HEIGHT - 1][WIDTH / 2] = 0;
+                            break;
+                        case IZQUIERDA:
+                            rooms[i][HEIGHT / 2][0] = 0;
+                            break;
+                        case DERECHA:
+                            rooms[i][HEIGHT / 2][WIDTH - 1] = 0;
+                            break;
+                    }
                 }
             }
         }
