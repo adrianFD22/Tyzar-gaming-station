@@ -27,10 +27,10 @@
 #include "graph.h"   // Aún no implementado
 #include "room.h"
 
-#define STATS_WIDTH 30
+#define STATS_WIDTH  30
 #define STATS_HEIGHT 10
 
-#define WINKIES_LENGTH 100
+#define WINKIES_LENGTH  100
 #define MAX_PROJECTILES 100 //arbitrario
                             //posible mecánica para recargar los proyectiles y poder volver a disparar
 
@@ -96,21 +96,14 @@ int main() {
 
     keypad(win_room, TRUE); // Permite el uso de las teclas de flecha. Hay que activarlo en la ventana
 
-    /*
-    // no furula
-    Graph* graph = create_random_graph();
-    int current_room = 0;           // Empezamos en el nodo 0 del grafo.
-    room = generate_room();   
-    int vecinos = graph->nodes[current_room].neighbor_count; // número de puertas abiertas
-    for (int i = 0; i < vecinos; i++) {
-        if (graph->nodes[current_room].doors[i] == -1) {
-            close_door(i, current_room, win_room);
-        }
-    }
-    */
     
+    // Generamos el grafo
+    Graph* graph = create_graph();
+    add_manual_edges(graph);
 
-    room = generate_room();  
+    int current_room = 0;               // Empezamos en el nodo 0 del grafo provisionalmente, será aleatorio.
+    room = generate_room();   
+    
     player.position[0] = 1;             // Inicializado junto a la puerta
     player.position[1] = HEIGHT / 2;    // de la izquierda y
     player.orientation = RIGHT;         // mirando hacia la derecha.
@@ -133,15 +126,26 @@ int main() {
         // Detectar si el smorger-hero cruza una puerta y cambiar de sala
         if (player.position[1] == 0 && player.position[0] == WIDTH / 2) {
             change_room(&player, UP);
+            current_room = graph->nodes[current_room].doors[UP];
         } else if (player.position[1] == HEIGHT - 1 && player.position[0] == WIDTH / 2) {
             change_room(&player, DOWN);
+            current_room = graph->nodes[current_room].doors[DOWN];
         } else if (player.position[0] == 0 && player.position[1] == HEIGHT / 2) {
             change_room(&player, LEFT);
+            current_room = graph->nodes[current_room].doors[LEFT];
         } else if (player.position[0] == WIDTH - 1 && player.position[1] == HEIGHT / 2) {
             change_room(&player, RIGHT);
+            current_room = graph->nodes[current_room].doors[RIGHT];
         }
         print_room(win_room, room, player, projectiles, num_projectiles);
         print_stats(win_stats, player);
+
+        // cerramos las puertas necesarias
+        for (int i = 0; i < 4; i++) {
+            if (graph->nodes[current_room].doors[i] == NONE) {  // cerramos puertas que no llevan a ninguna sala
+                close_door(i, win_room);
+            }
+        }
     }
 
     endwin();
@@ -200,15 +204,14 @@ void handle_input(smorger* player, int input, int** room, projectile projectiles
     }
 }
 
-// Cambia de sala cuando el smorger-hero cruza una puerta, en realidad solo te pone en
-// la puerta contraria, ya se cambiará
+// Cambia de sala cuando el smorger-hero cruza una puerta.
 // ADRIAN: por qué esto es un puntero?
 void change_room(smorger* player, int orientation) {
     switch(orientation) {
         case UP:
             // El jugador cruza la puerta superior y aparece en la puerta inferior
-            player->position[1] = HEIGHT - 2; // Altura menos 2 para evitar sobreescribir la pared inferior
-            player->position[0] = WIDTH / 2;  // Centrado en la puerta
+            player->position[1] = HEIGHT - 2; // Altura menos 2 para evitar sobreescribir la pared inferior.
+            player->position[0] = WIDTH / 2;  // Centrado en la puerta.
             break;
         case DOWN:
             // El jugador cruza la puerta inferior y aparece en la puerta superior
@@ -376,7 +379,9 @@ void check_size() {
 
 
 // cerrar las puertas que toca al entrar en sala nueva
-void close_door(int door, int** room, WINDOW* win) {
+// NOTA: WTF CASE RIGHT ?!
+//       falta hacer que no se pueda atravesar
+void close_door(int door, WINDOW* win) {
     wattron(win, A_STANDOUT);
     switch(door) {
         case UP:
@@ -389,7 +394,8 @@ void close_door(int door, int** room, WINDOW* win) {
             mvwprintw(win, HEIGHT / 2, 0, "  ");
             break;
         case RIGHT:
-            mvwprintw(win, HEIGHT / 2, WIDTH - 1, "  ");
+            mvwprintw(win, HEIGHT / 2, WIDTH + 38, "  "); // NO ENTIENDO POR QUÉ PERO ES ASÍ
             break;
     }
+    wattroff(win, A_STANDOUT);
 }
