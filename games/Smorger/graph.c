@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #define MAX_NODES 9
 #define MAX_EDGES 4
@@ -81,6 +82,76 @@ void add_manual_edges(Graph* graph) {
     graph->nodes[8].doors[DOWN] = -1;
     graph->nodes[8].doors[LEFT] = 7;
     graph->nodes[8].doors[RIGHT] = -1;
+
+    //--------------------------------
+    // se borran dos salas aleatroias
+    //--------------------------------
+    int random_num1;
+    int random_num2;
+
+    srand(time(NULL));
+    do {
+        random_num1 = rand() % 9; 
+        random_num2 = rand() % 9;
+    } while (random_num1 == random_num2);
+
+    // 1
+    // cerrar puertas de arriba
+    if (random_num1 == 0 || random_num1 == 1 || random_num1 == 2) {
+        graph->nodes[random_num1+3].doors[UP] = -1;
+    }
+    // cerrar puertas arriba y abajo
+    if (random_num1 == 3 || random_num1 == 4 || random_num1 == 5) {
+        graph->nodes[random_num1-3].doors[DOWN] = -1;
+        graph->nodes[random_num1+3].doors[UP] = -1;
+    }
+    // cerrar puertas abajo
+    if (random_num1 == 6 || random_num1 == 7 || random_num1 == 8) {
+        graph->nodes[random_num1-3].doors[DOWN] = -1;
+    }
+
+    // cerrar puertas izda
+    if (random_num1 == 0 || random_num1 == 3 || random_num1 == 6) {
+        graph->nodes[random_num1+1].doors[LEFT] = -1;
+    }
+    // cerrar puertas izda y dcha
+    if (random_num1 == 1 || random_num1 == 4 || random_num1 == 7) {
+        graph->nodes[random_num1+1].doors[LEFT] = -1;
+        graph->nodes[random_num1-1].doors[RIGHT] = -1;
+    }
+    // cerrar puertas dcha
+    if (random_num1 == 2 || random_num1 == 5 || random_num1 == 8) {
+        graph->nodes[random_num1-1].doors[RIGHT] = -1;
+    }
+
+    // 2
+    // cerrar puertas de arriba
+    if (random_num2 == 0 || random_num2 == 1 || random_num2 == 2) {
+        graph->nodes[random_num2+3].doors[UP] = -1;
+    }
+    // cerrar puertas arriba y abajo
+    if (random_num2 == 3 || random_num2 == 4 || random_num2 == 5) {
+        graph->nodes[random_num2-3].doors[DOWN] = -1;
+        graph->nodes[random_num2+3].doors[UP] = -1;
+    }
+    // cerrar puertas abajo
+    if (random_num2 == 6 || random_num2 == 7 || random_num2 == 8) {
+        graph->nodes[random_num2-3].doors[DOWN] = -1;
+    }
+
+    // cerrar puertas izda
+    if (random_num2 == 0 || random_num2 == 3 || random_num2 == 6) {
+        graph->nodes[random_num2+1].doors[LEFT] = -1;
+    }
+    // cerrar puertas izda y dcha
+    if (random_num2 == 1 || random_num2 == 4 || random_num2 == 7) {
+        graph->nodes[random_num2+1].doors[LEFT] = -1;
+        graph->nodes[random_num2-1].doors[RIGHT] = -1;
+    }
+    // cerrar puertas dcha
+    if (random_num2 == 2 || random_num2 == 5 || random_num2 == 8) {
+        graph->nodes[random_num2-1].doors[RIGHT] = -1;
+    }
 }
 
 void print_graph(Graph* graph) {

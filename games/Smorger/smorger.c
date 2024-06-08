@@ -24,6 +24,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>  // para memset()
+#include <time.h>
 #include "graph.h"   // Aún no implementado
 #include "room.h"
 
@@ -72,7 +73,7 @@ void print_player(WINDOW* win, smorger player, int corner_y, int corner_x);
 void change_room(smorger* player, int orientation);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
 void check_size();
-void close_door();
+void close_door(int door, WINDOW* win, int** room);
 
 int main() {
     int **room;
@@ -96,17 +97,26 @@ int main() {
 
     keypad(win_room, TRUE); // Permite el uso de las teclas de flecha. Hay que activarlo en la ventana
 
-    
-    // Generamos el grafo
+    //------------------------------------------------------------------------------
+    // Inicialización del grafo aleatorio y ubicación inicial aleatoria del smorger
+
+    // Generamos el grafo aleatorio
     Graph* graph = create_graph();
     add_manual_edges(graph);
 
-    int current_room = 0;               // Empezamos en el nodo 0 del grafo provisionalmente, será aleatorio.
+    
+    srand(time(NULL));
+    int current_room;
+    do {
+        current_room = rand() % 9;      // Empezamos en un nodo del grafo aleatorio disponible.
+    } while (graph->nodes[current_room].available == 0);
     room = generate_room();   
     
     player.position[0] = 1;             // Inicializado junto a la puerta
     player.position[1] = HEIGHT / 2;    // de la izquierda y
     player.orientation = RIGHT;         // mirando hacia la derecha.
+
+    //------------------------------------------------------------------------------
 
     // Provisional. Añadir winkies
     player.winkies[0] = ACS_PI;
@@ -143,7 +153,7 @@ int main() {
         // cerramos las puertas necesarias
         for (int i = 0; i < 4; i++) {
             if (graph->nodes[current_room].doors[i] == NONE) {  // cerramos puertas que no llevan a ninguna sala
-                close_door(i, win_room);
+                close_door(i, win_room, room);
             }
         }
     }
@@ -381,20 +391,24 @@ void check_size() {
 // cerrar las puertas que toca al entrar en sala nueva
 // NOTA: WTF CASE RIGHT ?!
 //       falta hacer que no se pueda atravesar
-void close_door(int door, WINDOW* win) {
+void close_door(int door, WINDOW* win, int** room) {
     wattron(win, A_STANDOUT);
     switch(door) {
         case UP:
             mvwprintw(win, 0, WIDTH, "  ");
+            room[0][WIDTH/2] = 1;
             break;
         case DOWN:
             mvwprintw(win, HEIGHT - 1, WIDTH, "  ");
+            room[HEIGHT - 1][WIDTH/2] = 1;
             break;
         case LEFT:
             mvwprintw(win, HEIGHT / 2, 0, "  ");
+            room[HEIGHT/2][0] = 1;
             break;
         case RIGHT:
             mvwprintw(win, HEIGHT / 2, WIDTH + 38, "  "); // NO ENTIENDO POR QUÉ PERO ES ASÍ
+            room[HEIGHT/2][WIDTH - 1] = 1;
             break;
     }
     wattroff(win, A_STANDOUT);
