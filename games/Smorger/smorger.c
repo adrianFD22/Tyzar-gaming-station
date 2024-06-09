@@ -24,8 +24,8 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>  // para memset()
-#include <time.h>
-#include "graph.h"   // Aún no implementado
+#include <time.h>    // para rand()/srand()
+#include "graph.h"   
 #include "room.h"
 
 #define STATS_WIDTH  30
@@ -66,6 +66,20 @@ struct projectile {
 };
 typedef struct projectile projectile;
 
+//Diseño del bluper, se aceptan sugerencias
+#define BLUPER_LR      "><"
+#define BLUPER_UP      "^^"
+#define BLUPER_DOWN    "vv"
+
+struct bluper {
+    int position[2];  // coordenadas del bluper
+    int orientation;  
+    int ammo;
+    int lives;        // toques para matarlo
+};
+typedef struct bluper bluper;
+
+// NOTA DIEGO , print_player no existe, no?
 void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[], int num_projectiles);
 void print_stats(WINDOW* win, smorger player);
 void handle_input(smorger* player, int input, int** room, projectile projectiles[], int* num_projectiles);
@@ -74,12 +88,15 @@ void change_room(smorger* player, int orientation);
 void update_projectiles(projectile projectiles[], int* num_projectiles, int** room);
 void check_size();
 void close_door(int door, WINDOW* win, int** room);
+void init_bluper(WINDOW* win, int** room, bluper* bluper);
 
 int main() {
     int **room;
     smorger player;
     projectile projectiles[MAX_PROJECTILES];
     int num_projectiles = 0;
+
+    bluper bluper;  // Provisionalmente sólo es 1.
 
     // Inicializar smorger. Podría ser una función si lo necesitamos en un futuro
     player.ammo = 20;
@@ -104,7 +121,6 @@ int main() {
     Graph* graph = create_graph();
     add_manual_edges(graph);
 
-    
     srand(time(NULL));
     int current_room;
     do {
@@ -117,6 +133,9 @@ int main() {
     player.orientation = RIGHT;         // mirando hacia la derecha.
 
     //------------------------------------------------------------------------------
+
+    // Inicializamos bluper, provisionalmente sólo es 1.
+    init_bluper(win_room, room, &bluper);
 
     // Provisional. Añadir winkies
     player.winkies[0] = ACS_PI;
@@ -137,18 +156,25 @@ int main() {
         if (player.position[1] == 0 && player.position[0] == WIDTH / 2) {
             change_room(&player, UP);
             current_room = graph->nodes[current_room].doors[UP];
+            init_bluper(win_room, room, &bluper); 
         } else if (player.position[1] == HEIGHT - 1 && player.position[0] == WIDTH / 2) {
             change_room(&player, DOWN);
             current_room = graph->nodes[current_room].doors[DOWN];
+            init_bluper(win_room, room, &bluper); 
         } else if (player.position[0] == 0 && player.position[1] == HEIGHT / 2) {
             change_room(&player, LEFT);
             current_room = graph->nodes[current_room].doors[LEFT];
+            init_bluper(win_room, room, &bluper); 
         } else if (player.position[0] == WIDTH - 1 && player.position[1] == HEIGHT / 2) {
             change_room(&player, RIGHT);
             current_room = graph->nodes[current_room].doors[RIGHT];
+            init_bluper(win_room, room, &bluper); 
         }
         print_room(win_room, room, player, projectiles, num_projectiles);
         print_stats(win_stats, player);
+
+        // PROVISIONAL, irá cambiando con la función print_room, de momento es estático
+        mvwprintw(win_room, bluper.position[1], 2 * bluper.position[0], BLUPER_LR);
 
         // cerramos las puertas necesarias
         for (int i = 0; i < 4; i++) {
@@ -303,8 +329,24 @@ void print_room(WINDOW* win, int** room, smorger player, projectile projectiles[
         }
     }
 
+    // -----------
+    //    Blupers
+    // -----------
+    // Algoritmo de movimiento de blupers
+
     wrefresh(win); // Actualiza la ventana con los nuevos cambios
 }
+
+void init_bluper(WINDOW* win, int** room, bluper* b) {
+    // Ha de aparecer en un lugar aleatorio pero disponible.
+    do {
+        b->position[0] = (rand() % (WIDTH - 6)) + 3;   // Dejo margen para que no
+        b->position[1] = (rand() % (HEIGHT - 6)) + 3;  // Pueda aparecer en la cara del smorger
+    } while (room[b->position[1]][b->position[0]] == 1);
+
+    mvwprintw(win, b->position[1], 2 * b->position[0], BLUPER_LR);
+}
+
 
 void print_stats(WINDOW* win, smorger player) {
     werase(win);
